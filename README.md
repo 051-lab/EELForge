@@ -32,6 +32,16 @@ The current application provides:
 - Markdown prompt export
 - Visible future modes for Build, Repair, Refine, Optimize, and Review
 
+## Portable single-file edition
+
+A self-contained AI-agent handoff edition is available at:
+
+[`releases/EELForge-v0.1-Phase2A-Handoff.html`](releases/EELForge-v0.1-Phase2A-Handoff.html)
+
+Download the file and open it directly in Chrome or Edge. It contains all required CSS, JavaScript, project metadata, and agent instructions, so it does not require Node.js, npm, Vite, a local server, or an internet connection.
+
+The portable HTML can also be uploaded directly to Qwen, Mistral, Claude, Gemini, or another AI platform for review and proposed modifications. It is a generated handoff artifact; accepted changes should be backported into the modular TypeScript/Vite source before an official release is rebuilt.
+
 ## Run locally
 
 ### Requirements
@@ -99,6 +109,8 @@ Optional sections are omitted when empty. Inputs containing only punctuation suc
 EELForge/
 ├── .github/workflows/ci.yml
 ├── docs/
+├── releases/
+│   └── EELForge-v0.1-Phase2A-Handoff.html
 ├── src/
 │   ├── prompt/
 │   ├── domain.ts
