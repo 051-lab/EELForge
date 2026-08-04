@@ -11,7 +11,9 @@ describe('dashboard lifecycle', () => {
     const user = userEvent.setup();
     const store = testStore();
     render(<App store={store} />);
-    await user.click(screen.getByRole('button', { name: 'New Project' }));
+    const dashboardHeader = screen.getByRole('heading', { name: 'EELForge Projects' }).parentElement?.parentElement;
+    expect(dashboardHeader).not.toBeNull();
+    await user.click(within(dashboardHeader!).getByRole('button', { name: 'New Project' }));
     expect(screen.getByText('Welcome to EELForge')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Dashboard' }));
 

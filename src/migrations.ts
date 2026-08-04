@@ -57,14 +57,14 @@ export function isRecognizableProject(value: unknown): boolean {
 export function migrateProject(value: unknown): ProjectState {
   const candidate = unwrapProjectCandidate(value);
   if (!isRecord(candidate)) throw new Error('Project data must be an object.');
-  if (!isRecognizableProject(candidate)) throw new Error('Unsupported EELForge project structure.');
 
-  const defaults = createDefaultProject();
   const schema = candidate.schemaVersion;
   if (schema !== undefined && schema !== 1 && schema !== 2 && schema !== 3) {
     throw new Error('Unsupported EELForge project schema.');
   }
+  if (!isRecognizableProject(candidate)) throw new Error('Unsupported EELForge project structure.');
 
+  const defaults = createDefaultProject();
   const vision = isRecord(candidate.vision) ? candidate.vision : {};
   const contract = isRecord(candidate.contract) ? candidate.contract : {};
   const originalName = stringValue(candidate, 'name', defaults.name);

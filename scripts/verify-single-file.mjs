@@ -20,7 +20,7 @@ export function verifySingleFile(html) {
     [/<link\b[^>]*rel=["']?stylesheet["']?[^>]*href\s*=/i, 'external stylesheet'],
     [/\bhttps?:\/\//i, 'HTTP resource'],
     [/\bsrc\s*=\s*["']\/\//i, 'protocol-relative resource'],
-    [/\b(?:src|href)\s*=\s*["']\/assets\//i, 'unresolved /assets/ path'],
+    [/\/assets\//i, 'unresolved /assets/ path'],
     [/\bimport\s*\(/, 'dynamic import'],
     [/serviceWorker\s*\./i, 'service worker'],
     [/<script\b[^>]*type=["']module["']/i, 'module script'],
