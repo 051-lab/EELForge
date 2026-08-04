@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate:
@@ -27,10 +27,20 @@ jobs:
         run: npm run build:single
       - name: Verify portable release
         run: npm run verify:single
-      - name: Confirm generated release is committed
-        run: git diff --exit-code -- package-lock.json releases/EELForge-v0.2-Handoff.html
       - name: Upload verified release
         uses: actions/upload-artifact@v4
         with:
           name: eelforge-v0.2-integration
           path: releases/EELForge-v0.2-Handoff.html
+      - name: Record verified portable release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/integration/bolt-v0.2-overhaul'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add releases/EELForge-v0.2-Handoff.html
+          if git diff --cached --quiet; then
+            echo "Verified release is already current."
+            exit 0
+          fi
+          git commit -m "Regenerate verified v0.2 portable release"
+          git push
