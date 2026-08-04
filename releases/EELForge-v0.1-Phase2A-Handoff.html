@@ -1,0 +1,1144 @@
+<!doctype html>
+<!-- EELFORGE:HANDOFF-HEADER:BEGIN
+===============================================================================
+EELFORGE AGENT HANDOFF
+===============================================================================
+Product: EELForge
+Release: 0.1-phase2a
+Schema version: 2
+Artifact: EELForge-v0.1-Phase2A-Handoff.html
+
+PURPOSE
+EELForge converts descriptions of audio effects into structured,
+host-aware prompts for designing EEL2 DSP scripts for RootlessJamesDSP.
+
+CANONICAL WORKFLOW
+Vision -> Architect -> Prompt -> Analyze -> Refine
+
+IMPLEMENTED IN THIS RELEASE
+- Plugin Vision and Implementation Contract forms
+- RootlessJamesDSP Modern, Legacy, and Generic EEL2 host profiles
+- Architect Handoff compiler
+- Meaningful-context validation and readiness feedback
+- Focus-safe live text entry
+- Schema-1 migration and schema-2 local persistence
+- JSON project import/export
+- Markdown Architect Handoff export
+
+NOT IMPLEMENTED YET
+- Build, Repair, Refine, Optimize, or Review prompt execution
+- DSP architecture recommendation engine
+- EEL2 static analysis or EEL_VM execution
+- Built-in AI or network services
+
+NON-NEGOTIABLE BEHAVIORS
+- Preserve direct file:// execution and offline operation.
+- Add no external runtime dependency, telemetry, or hidden network access.
+- Preserve focus while users type.
+- Treat punctuation-only values as empty.
+- Omit empty optional prompt fields.
+- Preserve schema-1 migration and schema-2 persistence.
+- Architect mode must not request a final EEL2 script.
+
+VALIDATION CHECKLIST
+1. Open this file directly in Chrome or Edge.
+2. Confirm the Plugin Vision form renders.
+3. Type multiple characters continuously into a textarea.
+4. Confirm punctuation-only input does not increase completion.
+5. Complete all five required fields and confirm READY states.
+6. Export and re-import project JSON.
+7. Export the Architect Markdown handoff.
+
+CANONICAL-SOURCE POLICY
+This file is a generated handoff artifact. Accepted changes must be backported
+into the modular TypeScript/Vite source before an official release is rebuilt.
+===============================================================================
+EELFORGE:HANDOFF-HEADER:END -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0f1319" />
+  <title>EELForge v0.1 — EEL2 Prompt Workbench</title>
+  
+<!-- EELFORGE:MANIFEST:BEGIN -->
+<script type="application/json" id="eelforge-manifest">{
+  "product": "EELForge",
+  "release": "0.1-phase2a",
+  "schemaVersion": 2,
+  "edition": "ai-handoff",
+  "canonicalSource": "typescript-vite",
+  "offline": true,
+  "directFileExecution": true,
+  "implementedPromptModes": [
+    "architect"
+  ],
+  "plannedPromptModes": [
+    "build",
+    "repair",
+    "refine",
+    "optimize",
+    "review"
+  ],
+  "requiredBehaviors": [
+    "focus-safe text entry",
+    "punctuation-only input ignored",
+    "empty optional prompt fields omitted",
+    "schema-1 project migration",
+    "schema-2 project persistence"
+  ]
+}</script>
+<!-- EELFORGE:MANIFEST:END -->
+<!-- EELFORGE:STYLES:BEGIN -->
+<style>
+:root {
+  --bg: #0f1319;
+  --panel: #161c25;
+  --panel-2: #121820;
+  --terminal: #090d12;
+  --line: #293444;
+  --line-soft: #33405255;
+  --ink: #e7edf4;
+  --muted: #8b98a9;
+  --faint: #5d6a7b;
+  --accent: #ff8a3d;
+  --accent-2: #5ad0ff;
+  --good: #5ee0a0;
+  --warn: #ffd166;
+  --bad: #ff6b6b;
+  --mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  font-family: var(--sans);
+  background: var(--bg);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--bg); }
+body { margin: 0; min-height: 100vh; background:
+  radial-gradient(1000px 420px at 82% -10%, rgb(255 138 61 / 8%), transparent 60%),
+  radial-gradient(850px 420px at -10% 110%, rgb(90 208 255 / 6%), transparent 62%),
+  linear-gradient(rgb(148 163 184 / 3%) 1px, transparent 1px),
+  linear-gradient(90deg, rgb(148 163 184 / 3%) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+}
+button, input, textarea, select { font: inherit; }
+button, select { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+.sweep { position: fixed; inset: -160px 0 auto; height: 150px; pointer-events: none; z-index: 0; background: linear-gradient(180deg, transparent, rgb(90 208 255 / 4%), transparent); animation: sweep 18s linear infinite; }
+@keyframes sweep { to { transform: translateY(calc(100vh + 320px)); } }
+
+.app-header { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: rgb(15 19 25 / 90%); backdrop-filter: blur(10px); }
+.header-inner { max-width: 1360px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.logo { font: 800 18px var(--mono); letter-spacing: 4px; }
+.logo span { color: var(--accent); margin-right: 5px; }
+.logo b { margin-left: 5px; border: 1px solid var(--accent); border-radius: 4px; padding: 1px 5px; color: var(--accent); font-size: 9px; letter-spacing: 1px; }
+.tagline { margin-top: 2px; color: var(--muted); font-size: 12px; font-style: italic; }
+.header-actions { display: flex; gap: 7px; }
+
+.pipeline { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.stage { border: 0; background: transparent; color: var(--faint); display: flex; align-items: center; gap: 6px; padding: 4px 0; font: 700 9px var(--mono); letter-spacing: 1px; }
+.stage i { width: 20px; height: 20px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; font-style: normal; }
+.stage.active { color: var(--ink); }
+.stage.active i { color: #211407; border-color: var(--accent); background: var(--accent); box-shadow: 0 0 0 5px rgb(255 138 61 / 10%); }
+.stage.done i { border-color: var(--good); color: var(--good); }
+.pipeline-line { width: 14px; height: 1px; background: var(--line); }
+
+.button { border: 0; border-radius: 8px; background: var(--accent); color: #211407; padding: 8px 13px; font-size: 12px; font-weight: 750; }
+.button:hover { filter: brightness(1.08); }
+.button.ghost { border: 1px solid var(--line); background: transparent; color: var(--ink); }
+.button.ghost:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+.button.danger:hover { border-color: var(--bad); color: var(--bad); }
+.file-button { display: inline-flex; align-items: center; }
+.file-button input { display: none; }
+
+.guide { max-width: 1320px; margin: 14px auto 0; padding: 11px 13px; position: relative; z-index: 1; border: 1px solid rgb(255 138 61 / 50%); border-radius: 10px; background: rgb(255 138 61 / 7%); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.guide.hidden { display: none; }
+.guide strong { display: block; font-size: 12px; }
+.guide span { color: var(--muted); font-size: 11px; }
+
+main { max-width: 1360px; margin: 0 auto; padding: 18px 20px 28px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 18px; position: relative; z-index: 1; }
+.column { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.panel { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: 16px; box-shadow: 0 12px 32px rgb(0 0 0 / 12%); }
+.panel-head { margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--muted); font: 750 10px var(--mono); letter-spacing: 1.5px; }
+.panel-head b { color: var(--accent); font-size: 14px; }
+.completion, .status-chip { border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px; color: var(--good); font-size: 9px; letter-spacing: .5px; }
+.status-chip.pending { color: var(--warn); }
+
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+label { display: block; margin-bottom: 5px; color: var(--muted); font: 700 10px var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+input, textarea, select { width: 100%; border: 1px solid var(--line); border-radius: 8px; background: #10151c; color: var(--ink); padding: 9px 10px; }
+textarea { resize: vertical; line-height: 1.5; }
+input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgb(255 138 61 / 12%); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.check-row { display: flex; gap: 18px; flex-wrap: wrap; margin: 5px 0 14px; }
+.check-row label { display: flex; align-items: center; gap: 7px; text-transform: none; letter-spacing: 0; }
+.check-row input { width: auto; accent-color: var(--accent); }
+details { border-top: 1px dashed var(--line); padding-top: 12px; }
+summary { cursor: pointer; color: var(--accent-2); font: 700 10px var(--mono); letter-spacing: 1px; }
+.details-grid { margin-top: 12px; }
+
+.empty-flow, .chain-empty { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; }
+.empty-flow div, .chain-empty div { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); padding: 10px; text-align: center; }
+.empty-flow b, .chain-empty b { display: block; font: 750 10px var(--mono); letter-spacing: 1px; }
+.empty-flow span, .chain-empty span { display: block; margin-top: 3px; color: var(--faint); font-size: 9px; }
+.empty-flow i, .chain-empty i { color: var(--accent); font-style: normal; }
+.muted { color: var(--muted); font-size: 12px; line-height: 1.55; }
+.contract-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+.contract-summary div { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); padding: 9px; }
+.contract-summary span { display: block; color: var(--faint); font: 700 8px var(--mono); letter-spacing: 1px; }
+.contract-summary b { display: block; margin-top: 4px; font-size: 11px; }
+
+.terminal-panel { padding: 0; overflow: hidden; background: var(--terminal); }
+.terminal-head { padding: 10px 13px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: #10151d; color: var(--muted); font: 700 10px var(--mono); letter-spacing: 1px; }
+.terminal-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 6px; }
+pre { margin: 0; padding: 15px 17px; max-height: 500px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; color: #d4dee9; font: 12px/1.6 var(--mono); }
+.terminal-actions { padding: 12px 14px; display: flex; gap: 8px; border-top: 1px solid var(--line); background: #10151d; }
+
+footer { max-width: 1360px; margin: 0 auto; padding: 0 20px 25px; position: relative; z-index: 1; color: var(--faint); text-align: center; font: 10px var(--mono); }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 10px); opacity: 0; border: 1px solid var(--accent); border-radius: 8px; background: #1b2330; color: var(--ink); padding: 9px 14px; transition: opacity .18s, transform .18s; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 1050px) {
+  main { grid-template-columns: 1fr; }
+  .pipeline { order: 3; width: 100%; justify-content: center; }
+}
+@media (max-width: 700px) {
+  .header-inner, main { padding-left: 14px; padding-right: 14px; }
+  .guide { margin-left: 14px; margin-right: 14px; align-items: flex-start; }
+  .form-grid, .contract-summary { grid-template-columns: 1fr; }
+  .empty-flow, .chain-empty { grid-template-columns: 1fr; }
+  .empty-flow i, .chain-empty i { transform: rotate(90deg); justify-self: center; }
+  .stage span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Phase 2A: prompt workbench and readiness ---------- */
+.completion.draft { color: var(--warn); border-color: rgb(255 209 102 / 45%); }
+.completion.ready { color: var(--good); border-color: rgb(94 224 160 / 45%); }
+
+.prompt-workbench { padding-bottom: 13px; }
+.prompt-mode-head { margin-bottom: 10px; }
+.mode-selector { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; background: var(--panel-2); }
+.mode-button { min-width: 0; border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); padding: 8px 6px; font: 750 9px var(--mono); letter-spacing: .8px; }
+.mode-button:last-child { border-right: 0; }
+.mode-button.active { background: var(--accent); color: #211407; }
+.mode-button:disabled { cursor: not-allowed; color: var(--faint); opacity: .58; }
+.mode-button small { display: block; margin-top: 2px; color: var(--warn); font-size: 7px; letter-spacing: .8px; }
+.mode-button.active small { color: #211407; }
+.mode-note { margin: 9px 2px 0; color: var(--faint); font-size: 10.5px; line-height: 1.5; }
+
+.prompt-meta { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.readiness { border: 1px solid var(--line); border-radius: 999px; padding: 2px 7px; font-size: 8.5px; letter-spacing: .7px; }
+.readiness.draft { color: var(--warn); border-color: rgb(255 209 102 / 50%); }
+.readiness.ready { color: var(--good); border-color: rgb(94 224 160 / 50%); }
+.missing-fields { padding: 8px 14px; border-bottom: 1px solid var(--line); background: rgb(255 209 102 / 5%); color: var(--warn); font: 10px/1.45 var(--mono); }
+.missing-fields.ready { background: rgb(94 224 160 / 5%); color: var(--good); }
+
+@media (max-width: 820px) {
+  .mode-selector { grid-template-columns: repeat(3, 1fr); }
+  .mode-button:nth-child(3) { border-right: 0; }
+  .mode-button:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+  .prompt-meta { align-items: flex-end; flex-direction: column; gap: 4px; }
+}
+
+</style>
+<!-- EELFORGE:STYLES:END -->
+</head>
+<body>
+  <div id="app"></div>
+  
+<!-- EELFORGE:APPLICATION:BEGIN -->
+<script>
+(() => {
+  const modules = {
+"src/domain.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hostSections = exports.hostLabels = exports.promptModes = exports.stages = void 0;
+exports.createDefaultProject = createDefaultProject;
+exports.stages = [
+    'vision',
+    'architect',
+    'prompt',
+    'analyze',
+    'refine',
+];
+exports.promptModes = [
+    'architect',
+    'build',
+    'repair',
+    'refine',
+    'optimize',
+    'review',
+];
+exports.hostLabels = {
+    'rjdsp-modern': 'RootlessJamesDSP Modern',
+    'rjdsp-legacy': 'RootlessJamesDSP Legacy',
+    'eel-vm-core': 'Generic EEL2 / EEL_VM',
+};
+exports.hostSections = {
+    'rjdsp-modern': ['@init', '@slider', '@block', '@sample'],
+    'rjdsp-legacy': ['@init', '@sample'],
+    'eel-vm-core': [],
+};
+function createDefaultProject() {
+    const now = new Date().toISOString();
+    return {
+        schemaVersion: 2,
+        appVersion: '0.1.0-alpha.3',
+        id: crypto.randomUUID(),
+        name: '',
+        createdAt: now,
+        updatedAt: now,
+        activeStage: 'vision',
+        promptMode: 'architect',
+        vision: {
+            purpose: '',
+            audibleGoal: '',
+            sourceMaterial: '',
+            definitionOfSuccess: '',
+            preserve: '',
+            avoid: '',
+            useLocation: '',
+            desiredControls: '',
+            references: '',
+        },
+        contract: {
+            hostProfileId: 'rjdsp-modern',
+            channelMode: 'stereo',
+            sampleRates: [44100, 48000],
+            latencyMode: 'zero',
+            cpuTarget: 'mobile-balanced',
+            deviceTargets: 'Galaxy S10; Galaxy S24 Ultra',
+            parameterSmoothing: true,
+            outputProtection: true,
+            constraints: '',
+        },
+        onboardingDismissed: false,
+    };
+}
+
+},
+"src/filename.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.safeProjectSlug = safeProjectSlug;
+const meaningful_js_1 = require("./prompt/meaningful.js");
+function safeProjectSlug(name) {
+    if (!(0, meaningful_js_1.hasMeaningfulContent)(name))
+        return 'untitled-eel-effect';
+    const slug = name
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 80);
+    return slug || 'untitled-eel-effect';
+}
+
+},
+"src/main.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("./styles.css");
+const domain_js_1 = require("./domain.js");
+const filename_js_1 = require("./filename.js");
+const prompt_js_1 = require("./prompt.js");
+const store_js_1 = require("./store.js");
+const store = new store_js_1.ProjectStore();
+function requiredElement(selector) {
+    const element = document.querySelector(selector);
+    if (!element)
+        throw new Error(`Required element is missing: ${selector}`);
+    return element;
+}
+const app = requiredElement('#app');
+function escapeHtml(value) {
+    return value.replace(/[&<>'"]/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+    })[character] ?? character);
+}
+function options(entries, selected, labels) {
+    return entries.map((entry) => (`<option value="${entry}" ${entry === selected ? 'selected' : ''}>${escapeHtml(labels?.[entry] ?? entry)}</option>`)).join('');
+}
+function essentialCompletion(state) {
+    const fields = [
+        state.name,
+        state.vision.purpose,
+        state.vision.audibleGoal,
+        state.vision.sourceMaterial,
+        state.vision.definitionOfSuccess,
+    ];
+    return {
+        complete: fields.filter(prompt_js_1.hasMeaningfulContent).length,
+        total: fields.length,
+    };
+}
+function completionText(state) {
+    const completion = essentialCompletion(state);
+    return completion.complete === completion.total
+        ? 'READY FOR ARCHITECT'
+        : `${completion.complete}/${completion.total} essential fields`;
+}
+function readinessText(state) {
+    const compiled = (0, prompt_js_1.compilePrompt)(state);
+    return compiled.readiness === 'ready'
+        ? 'READY'
+        : `DRAFT · ${compiled.missingRequiredFields.length} REQUIRED ${compiled.missingRequiredFields.length === 1 ? 'FIELD' : 'FIELDS'} MISSING`;
+}
+function missingFieldsText(state) {
+    const missing = (0, prompt_js_1.compilePrompt)(state).missingRequiredFields;
+    return missing.length ? `Missing: ${missing.join(', ')}` : 'All required Architect context is present.';
+}
+function modeSelector(state) {
+    return domain_js_1.promptModes.map((mode) => {
+        const implemented = mode === 'architect';
+        const active = state.promptMode === mode && implemented;
+        const label = mode.toUpperCase();
+        const suffix = mode === 'build' ? '<small>NEXT</small>' : '';
+        const title = implemented
+            ? 'Generate an implementation-ready DSP architecture report.'
+            : `${label.charAt(0)}${label.slice(1).toLowerCase()} mode arrives in a later Phase 2 slice.`;
+        return `<button class="mode-button ${active ? 'active' : ''}" ${implemented ? 'data-prompt-mode="architect"' : 'disabled'} title="${escapeHtml(title)}">${label}${suffix}</button>`;
+    }).join('');
+}
+function render(state) {
+    const compiled = (0, prompt_js_1.compilePrompt)(state);
+    const completion = essentialCompletion(state);
+    app.innerHTML = `
+    <div class="sweep" aria-hidden="true"></div>
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="logo"><span>⌁</span>EELFORGE <b>v0.1</b></div>
+          <div class="tagline">Describe the sound · formalize the DSP · build the EEL2</div>
+        </div>
+        <nav class="pipeline" aria-label="EELForge workflow">
+          ${domain_js_1.stages.map((stage, index) => {
+        const currentIndex = domain_js_1.stages.indexOf(state.activeStage);
+        const className = index < currentIndex ? 'done' : stage === state.activeStage ? 'active' : '';
+        return `<button class="stage ${className}" data-stage="${stage}"><i>${index + 1}</i><span>${stage.toUpperCase()}</span></button>`;
+    }).join('<span class="pipeline-line"></span>')}
+        </nav>
+        <div class="header-actions">
+          <button class="button ghost" id="export-project">Export</button>
+          <label class="button ghost file-button">Import<input id="import-project" type="file" accept="application/json,.json" /></label>
+          <button class="button ghost danger" id="reset-project">Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="guide ${state.onboardingDismissed ? 'hidden' : ''}">
+      <div>
+        <strong>Architect Handoff is active.</strong>
+        <span>Complete the five essential fields, refine the runtime contract, then copy or export the compiled agent handoff.</span>
+      </div>
+      <button class="button ghost" id="dismiss-guide">Got it</button>
+    </section>
+
+    <main>
+      <section class="column">
+        <article class="panel">
+          <div class="panel-head">
+            <div><b>01</b> · PLUGIN VISION</div>
+            <span class="completion ${completion.complete === completion.total ? 'ready' : 'draft'}" id="completion-status">${completionText(state)}</span>
+          </div>
+
+          <div class="field">
+            <label for="project-name">Plugin name</label>
+            <input id="project-name" data-name value="${escapeHtml(state.name)}" placeholder="RecordPath, PrismSoundSphere, Living Material..." />
+          </div>
+          <div class="field">
+            <label for="purpose">What should this plugin do?</label>
+            <textarea id="purpose" rows="3" data-path="vision.purpose" placeholder="A minimal tape/console processor that adds density and smoothness...">${escapeHtml(state.vision.purpose)}</textarea>
+          </div>
+          <div class="field">
+            <label for="audible-goal">What should it sound like?</label>
+            <textarea id="audible-goal" rows="3" data-path="vision.audibleGoal" placeholder="More dimensional and cohesive, without obvious pumping or dullness...">${escapeHtml(state.vision.audibleGoal)}</textarea>
+          </div>
+          <div class="field">
+            <label for="source-material">Where or on what material will it be used?</label>
+            <textarea id="source-material" rows="2" data-path="vision.sourceMaterial" placeholder="Full mixes, streaming playback, vocals, drums, individual tracks...">${escapeHtml(state.vision.sourceMaterial)}</textarea>
+          </div>
+          <div class="field">
+            <label for="success">What would make the result successful?</label>
+            <textarea id="success" rows="2" data-path="vision.definitionOfSuccess" placeholder="Loads without errors, preserves transients, stays smooth on a Galaxy S10, and remains useful across genres...">${escapeHtml(state.vision.definitionOfSuccess)}</textarea>
+          </div>
+          <details>
+            <summary>Advanced sonic context</summary>
+            <div class="details-grid">
+              <div class="field"><label for="preserve">Preserve</label><textarea id="preserve" rows="2" data-path="vision.preserve" placeholder="Transient impact, stereo center, low-frequency solidity...">${escapeHtml(state.vision.preserve)}</textarea></div>
+              <div class="field"><label for="avoid">Avoid</label><textarea id="avoid" rows="2" data-path="vision.avoid" placeholder="Pumping, brittle highs, bass narrowing, obvious modulation...">${escapeHtml(state.vision.avoid)}</textarea></div>
+              <div class="field"><label for="location">Intended use / insertion point</label><input id="location" data-path="vision.useLocation" value="${escapeHtml(state.vision.useLocation)}" placeholder="System-wide playback, master bus, individual track..." /></div>
+              <div class="field"><label for="controls">Preferred controls</label><textarea id="controls" rows="2" data-path="vision.desiredControls" placeholder="One Character control, Output Trim, and Mix; hide technical parameters...">${escapeHtml(state.vision.desiredControls)}</textarea></div>
+              <div class="field"><label for="references">References / inspiration</label><textarea id="references" rows="2" data-path="vision.references" placeholder="Airwindows names, hardware traits, or prior EEL effects...">${escapeHtml(state.vision.references)}</textarea></div>
+            </div>
+          </details>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><b>02</b> · IMPLEMENTATION CONTRACT</div><span class="status-chip">LOCAL-FIRST</span></div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="host">Host profile</label>
+              <select id="host" data-path="contract.hostProfileId">${options(Object.keys(domain_js_1.hostLabels), state.contract.hostProfileId, domain_js_1.hostLabels)}</select>
+            </div>
+            <div class="field">
+              <label for="channel-mode">Channel mode</label>
+              <select id="channel-mode" data-path="contract.channelMode">${options(['mono', 'stereo', 'linked-stereo', 'dual-mono', 'mid-side'], state.contract.channelMode)}</select>
+            </div>
+            <div class="field">
+              <label for ="latency">Latency mode</label>
+              <select id="latency" data-path="contract.latencyMode">${options(['zero', 'low', 'allowed'], state.contract.latencyMode)}</select>
+            </div>
+            <div class="field">
+              <label for ="cpu">CPU target</label>
+              <select id="cpu" data-path="contract.cpuTarget">${options(['mobile-light', 'mobile-balanced', 'desktop-quality'], state.contract.cpuTarget)}</select>
+            </div>
+          </div>
+          <div class="field">
+            <label for ="devices">Device targets</label>
+            <input id="devices" data-path="contract.deviceTargets" value="${escapeHtml(state.contract.deviceTargets)}" />
+          </div>
+          <div class="check-row">
+            <label><input type="checkbox" data-path="contract.parameterSmoothing" ${state.contract.parameterSmoothing ? 'checked' : ''} /> Parameter smoothing required</label>
+            <label><input type="checkbox" data-path="contract.outputProtection" ${state.contract.outputProtection ? 'checked' : ''} /> Output protection required</label>
+          </div>
+          <div class="field">
+            <label for="constraints">Additional constraints</label>
+            <textarea id="constraints" rows="2" data-path="contract.constraints" placeholder="No STFT; zero latency; preserve accepted control behavior...">${escapeHtml(state.contract.constraints)}</textarea>
+          </div>
+        </article>
+      </section>
+
+      <section class="column">
+        <article class="panel architect-panel">
+          <div class="panel-head"><div><b>03</b> · DSP ARCHITECT</div><span class="status-chip pending">PHASE 3 ENGINE PENDING</span></div>
+          <div class="empty-flow">
+            <div><b>INPUT</b><span>Vision and constraints</span><i>→</i>
+            <div><b>INTERPRET</b><span>Traits and weighted signals</span><i>→</i>
+            <div><b>CHAIN</b><span>Explainable DSP blocks</span></div>
+          </div>
+          <p class="muted">The Architect Handoff formalizes your requirements without inventing a DSP chain. Phase 3 will add explainable block recommendations, alternatives, and CPU/latency conflict checks.</p>
+          <div class="contract-summary">
+            <div><span>HOST</span><b id="summary-host">${escapeHtml(domain_js_1.hostLabels[state.contract.hostProfileId])}</b></div>
+            <div><span channels</span><b id="summary-channels">${escapeHtml(state.contract.channelMode}</b></div>
+            <div><span CPU</span><b id="summary-cpu">${escapeHtml(state.contract.cpuTarget)}</b></div>
+            <div><span>LATENCY</span><b id="summary-latency">${escapeHtml(state.contract.latencyMode()}</b></div>
+          </div>
+        </article>
+
+        <article class="panel prompt-workbench">
+          <div class="panel-head prompt-mode-head"><div><b>04</b> · AGENT HANDOFF</div><span class="status-chip">PHASE 2A</span></div>
+          <div class="mode-selector" aria-label="Prompt mode">
+            ${modeSelector(state)}
+          </div>
+          <p class="mode-note">Architect is active. Build is the next prompt mode; Repair, Refine, Optimize, and Review will follow after artifact import is available.</p>
+        </article>
+
+        <article class="panel terminal-panel">
+          <div class="terminal-head">
+            <div><span class="terminal-dot"></span> <span id="prompt-title">${escapeHtml(compiled.title.toUpperCase())}</span></div>
+            <div class="prompt-meta">
+              <span class="readiness ${compiled.readiness}" id="prompt-readiness">${escapeHtml(readinessText(state))}</span>
+              <span id="prompt-character-count">${compiled.characterCount.toLocaleString()} chars</span>
+            </div>
+          </div>
+          <div class="missing-fields ${compiled.readiness}" id="missing-fields">${escapeHtml(missingFieldsText(state))}</div>
+          <pre id="prompt-output">${escapeHtml(compiled.text)}</pre>
+          <div class="terminal-actions">
+            <button class="button" id="copy-prompt">Copy prompt</button>
+            <button class="button ghost" id="download-prompt">Export .md</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head"><div><b>05</b> · DEVELOPMENT CHAIN</div><span class="status-chip pending">EMPTY</span></div>
+          <div class="chain-empty">
+            <div><b>VISION</b><span>Current project contract</span></div>
+            <i>→</i>
+            <div><b>ARCHITECT</b><span>${compiled.readiness === 'ready' ? 'Handoff ready' : 'Draft handoff'}</span></div>
+            <i>→</i>
+            <div><b>EEL2</b><span>Phase 4 imported artifact</span></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      Phase 2A · Architect Handoff · focus-safe text entry · automatic local save · schema-v2 migration
+      <span id="toast" role="status" aria-live="polite"></span>
+    </footer>
+  `;
+    bindEvents();
+}
+function updateDerivedViews(state) {
+    const compiled = (0, prompt_js_1.compilePrompt)(state);
+    const completion = essentialCompletion(state);
+    const completionStatus = document.querySelector('#completion-status');
+    if (completionStatus) {
+        completionStatus.textContent = completionText(state);
+        completionStatus.classList.toggle('ready', completion.complete === completion.total);
+        completionStatus.classList.toggle('draft', completion.complete !== completion.total);
+    }
+    const promptOutput = document.querySelector('#prompt-output');
+    if (promptOutput)
+        promptOutput.textContent = compiled.text;
+    const promptCharacterCount = document.querySelector('#prompt-character-count');
+    if (promptCharacterCount)
+        promptCharacterCount.textContent = `${compiled.characterCount.toLocaleString()} chars`;
+    const promptReadiness = document.querySelector('#prompt-readiness');
+    if (promptReadiness) {
+        promptReadiness.textContent = readinessText(state);
+        promptReadiness.className = `readiness ${compiled.readiness}`;
+    }
+    const missingFields = document.querySelector('#missing-fields');
+    if (missingFields) {
+        missingFields.textContent = missingFieldsText(state);
+        missingFields.className = `missing-fields ${compiled.readiness}`;
+    }
+    const summaryHost = document.querySelector('#summary-host');
+    if (summaryHost)
+        summaryHost.textContent = domain_js_1.hostLabels[state.contract.hostProfileId];
+    const summaryChannels = document.querySelector('#summary-channels');
+    if (summaryChannels)
+        summaryChannels.textContent = state.contract.channelMode;
+    const summaryCpu = document.querySelector('#summary-cpu');
+    if (summaryCpu)
+        summaryCpu.textContent = state.contract.cpuTarget;
+    const summaryLatency = document.querySelector('#summary-latency');
+    if (summaryLatency)
+        summaryLatency.textContent = state.contract.latencyMode;
+}
+function showToast(message) {
+    const toast = document.querySelector('#toast');
+    if (!toast)
+        return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    window.setTimeout(() => toast.classList.remove('show'), 1800);
+}
+function download(content, filename) {
+    const url = URL.createObjectURL(content);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(url);
+}
+function bindEvents() {
+    document.querySelectorAll('[data-stage]').forEach((element) => {
+        element.addEventListener('click', () => {
+            const stage = element.dataset.stage;
+            if (stage)
+                store.dispatch({ type: 'set-stage', value: stage });
+        });
+    });
+    document.querySelector('[data-prompt-mode="architect"]')?.addEventListener('click', () => {
+        store.dispatch({ type: 'set-prompt-mode', value: 'architect' });
+    });
+    document.querySelector('[data-name]')?.addEventListener('input', (event) => {
+        const value = event.currentTarget.value;
+        store.dispatch({ type: 'set-name', value }, false);
+        updateDerivedViews(store.getState());
+    });
+    document.querySelectorAll('[data-path]').forEach((element) => {
+        const isCheckbox = element instanceof HTMLInputElement && element.type === 'checkbox';
+        const isContinuousTextInput = element instanceof HTMLTextAreaElement
+            || (element instanceof HTMLInputElement && !isCheckbox);
+        const eventName = isCheckbox ? 'change' : 'input';
+        element.addEventListener(eventName, () => {
+            const path = element.dataset.path;
+            if (!path)
+                return;
+            const value = isCheckbox && element instanceof HTMLInputElement
+                ? element.checked
+                : element.value;
+            // Continuous text entry updates only derived views. Replacing #app while
+            // typing would destroy the focused control and recreate the old one-character bug.
+            store.dispatch({ type: 'set-path', path, value }, !isContinuousTextInput);
+            if (isContinuousTextInput)
+                updateDerivedViews(store.getState());
+        });
+    });
+    document.querySelector('#dismiss-guide')?.addEventListener('click', () => {
+        store.dispatch({ type: 'dismiss-onboarding' });
+    });
+    document.querySelector('#copy-prompt')?.addEventListener('click', async () => {
+        await navigator.clipboard.writeText((0, prompt_js_1.compilePrompt)(store.getState()).text);
+        showToast('Architect handoff copied.');
+    });
+    document.querySelector('#download-prompt')?.addEventListener('click', () => {
+        const current = store.getState();
+        const compiled = (0, prompt_js_1.compilePrompt)(current);
+        download(new Blob([compiled.text], { type: 'text/markdown' }), `${(0, filename_js_1.safeProjectSlug)(current.name)}-architect-handoff.md`);
+    });
+    document.querySelector('#export-project')?.addEventListener('click', () => {
+        download(store.exportProject(), `eelforge-${(0, filename_js_1.safeProjectSlug)(store.getState().name)}.json`);
+    });
+    document.querySelector('#import-project')?.addEventListener('change', async (event) => {
+        const file = event.currentTarget.files?.[0];
+        if (!file)
+            return;
+        try {
+            const project = store.importProject(await file.text());
+            store.dispatch({ type: 'replace-project', value: project });
+            showToast('Project restored and migrated.');
+        }
+        catch (error) {
+            showToast(error instanceof Error ? error.message : 'Import failed.');
+        }
+    });
+    document.querySelector('#reset-project')?.addEventListener('click', () => {
+        if (window.confirm('Reset the current EELForge project?')) {
+            store.dispatch({ type: 'reset-project' });
+            showToast('Project reset.');
+        }
+    });
+}
+store.subscribe(render);
+
+},
+"src/prompt/architect.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.architectMissingFields = architectMissingFields;
+exports.buildArchitectPrompt = buildArchitectPrompt;
+const meaningful_js_1 = require("./meaningful.js");
+const shared_blocks_js_1 = require("./shared-blocks.js");
+const REQUIRED_FIELDS = [
+    { label: 'plugin name', read: (state) => state.name },
+    { label: 'plugin purpose', read: (state) => state.vision.purpose },
+    { label: 'audible result', read: (state) => state.vision.audibleGoal },
+    { label: 'source material', read: (state) => state.vision.sourceMaterial },
+    { label: 'definition of success', read: (state) => state.vision.definitionOfSuccess },
+];
+function architectMissingFields(state) {
+    return REQUIRED_FIELDS
+        .filter((field) => !(0, meaningful_js_1.hasMeaningfulContent)(field.read(state)))
+        .map((field) => field.label);
+}
+function buildArchitectPrompt(state) {
+    const missingRequiredFields = architectMissingFields(state);
+    const pluginBrief = (0, shared_blocks_js_1.compactLines)([
+        '## Plugin brief',
+        '',
+        (0, shared_blocks_js_1.bullet)('Project', state.name),
+        (0, shared_blocks_js_1.bullet)('Purpose', state.vision.purpose),
+        (0, shared_blocks_js_1.bullet)('Intended use', state.vision.useLocation),
+        (0, shared_blocks_js_1.bullet)('Source material', state.vision.sourceMaterial),
+        (0, shared_blocks_js_1.bullet)('Desired audible result', state.vision.audibleGoal),
+        (0, shared_blocks_js_1.bullet)('Definition of success', state.vision.definitionOfSuccess),
+    ]).join('\n');
+    const sonicBoundaryLines = (0, shared_blocks_js_1.compactLines)([
+        (0, shared_blocks_js_1.bullet)('Preserve', state.vision.preserve),
+        (0, shared_blocks_js_1.bullet)('Avoid', state.vision.avoid),
+        (0, shared_blocks_js_1.bullet)('Preferred controls', state.vision.desiredControls),
+        (0, shared_blocks_js_1.bullet)('References or inspiration', state.vision.references),
+    ]);
+    const sections = [
+        '# EELFORGE HANDOFF — ARCHITECT',
+        '',
+        'You are an audio DSP architect specializing in EEL2 effects for RootlessJamesDSP.',
+        '',
+        'Design an implementation-ready architecture for the plugin below. Do not write the final EEL2 script yet.',
+        '',
+        pluginBrief,
+        sonicBoundaryLines.length ? `## Sonic boundaries\n\n${sonicBoundaryLines.join('\n')}` : null,
+        (0, shared_blocks_js_1.runtimeTargetBlock)(state),
+        shared_blocks_js_1.EEL2_DESIGN_REQUIREMENTS,
+        [
+            '## Required deliverable',
+            '',
+            'Return an architecture report containing:',
+            '',
+            '1. Plugin concept and operating principle',
+            '2. Ordered signal-flow diagram',
+            '3. Algorithm proposed for each processing stage',
+            '4. Control definitions, ranges, defaults, mappings, and smoothing',
+            '5. Persistent state and memory requirements',
+            '6. Sample-rate adaptation strategy',
+            '7. Stereo-linking or mid/side behavior',
+            '8. CPU and latency assessment',
+            '9. Numerical-safety and output-protection strategy',
+            '10. Expected audible behavior and possible failure modes',
+            '11. Validation and listening-test plan`',
+            '12. Final implementation specification for the Build agent',
+            '',
+            'End with a concise **Recommended Build Specification** that another AI agent can use to write the complete EEL2 script.',
+        ].join('\n'),
+    ].filter((section) => Boolean(section));
+    const text = sections.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    return {
+        mode: 'architect',
+        title: 'Architect Handoff',
+        text,
+        characterCount: text.length,
+        readiness: missingRequiredFields.length === 0 ? 'ready' : 'draft',
+        missingRequiredFields,
+    };
+}
+
+},
+"src/prompt/compiler.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.compilePrompt = compilePrompt;
+const architect_js_1 = require("./architect.js");
+function compilePrompt(state) {
+    switch (state.promptMode) {
+        case 'architect':
+            return (0, architect_js_1.buildArchitectPrompt)(state);
+        case 'build':
+        case 'repair':
+        case 'refine':
+        case 'optimize':
+        case 'review':
+            throw new Error(`${state.promptMode} prompt mode is not implemented in Phase 2A.`);
+        default: {
+            const exhaustive = state.promptMode;
+            throw new Error(`Unsupported prompt mode: ${String(exhaustive)}`);
+        }
+    }
+}
+
+},
+"src/prompt/meaningful.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hasMeaningfulContent = hasMeaningfulContent;
+exports.meaningfulValue = meaningfulValue;
+const PUNCTUATION_ONLY = /[\s.\u–—_,;:!?(*[\]{}'"`~@#$%^&*+=|\\/<>]+/g;
+function hasMeaningfulContent(value) {
+    return value.replace(PUNCTUATION_ONLY, '').trim().length >= 2;
+}
+function meaningfulValue(value) {
+    const trimmed = value.trim();
+    return hasMeaningfulContent(trimmed) ? trimmed : null;
+}
+
+},
+"src/prompt/shared-blocks.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EEL2_DESIGN_REQUIREMENTS = void 0;
+exports.bullet = bullet;
+exports.compactLines = compactLines;
+exports.runtimeTargetBlock = runtimeTargetBlock;
+const domain_js_1 = require("../domain.js");
+const meaningful_js_1 = require("./meaningful.js");
+function formatSampleRate(rate) {
+    const khz = rate / 1000;
+    return `${Number.isInteger(khz) ? khz.toFixed(0) : khz} kHz`;
+}
+function bullet(label, value) {
+    const meaningful = (0, meaningful_js_1.meaningfulValue)(value);
+    return meaningful ? `- **${label}:** ${meaningful}` : null;
+}
+function compactLines(lines) {
+    return lines.filter((line) => line !== null && line !== undefined);
+}
+function runtimeTargetBlock(state) {
+    const sections = domain_js_1.hostSections[state.contract.hostProfileId];
+    const sampleRates = state.contract.sampleRates.map(formatSampleRate).join(', ');
+    return compactLines([
+        '## Runtime target',
+        '',
+        `- **Host:** ${domain_js_1.hostLabels[state.contract.hostProfileId]}`,
+        sections.length ? `- **Available sections:** ${sections.map((section) => `\\`${section}\\``).join(', ')}` : '- **Available sections:** No host-specific section contract predefined',
+        `- **Channel mode:** ${state.contract.channelMode}`,
+        `- **Sample rates:** ${sampleRates || 'Not specified'}`,
+        `- **Latency:** ${state.contract.latencyMode}`,
+        `- **CPU target:** ${state.contract.cpuTarget}`,
+        bullet('Device targets', state.contract.deviceTargets),
+        `- **Parameter smoothing:** ${state.contract.parameterSmoothing ? 'required' : 'not required'}`,
+        `- **Output protection:** ${state.contract.outputProtection ? 'required' : 'not required'}`,
+        bullet('Additional constraints', state.contract.constraints),
+    ]).join('\n');
+}
+exports.EEL2_DESIGN_REQUIREMENTS = [
+    '## EEL2 design requirements',
+    '',
+    '- Use EEL2-compatible syntax and execution patterns.',
+    '- Do not rely on C/C++ braces or ordinary `if/else` statements.',
+    '- Define helper functions before functions that call them.',
+    '- Do not use recursion.',
+    '- Initialize all persistent state explicitly.',
+    '- Keep left and right channel state independent unless linking is intentional.',
+    '- Move invariant and control-rate calculations out of `@sample` when possible.',
+    '- Keep the per-sample path bounded, numerically safe, and suitable for real-time mobile processing.',
+    '- State assumptions instead of silently inventing missing requirements.',
+].join('\n');
+
+},
+"src/prompt/types.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+
+},
+"src/prompt.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.meaningfulValue = exports.hasMeaningfulContent = exports.compilePrompt = void 0;
+var compiler_js_1 = require("./prompt/compiler.js");
+Object.defineProperty(exports, "compilePrompt", { enumerable: true, get: function () { return compiler_js_1.compilePrompt; } });
+var meaningful_js_1 = require("./prompt/meaningful.js");
+Object.defineProperty(exports, "hasMeaningfulContent", { enumerable: true, get: function () { return meaningful_js_1.hasMeaningfulContent; } });
+Object.defineProperty(exports, "meaningfulValue", { enumerable: true, get: function () { return meaningful_js_1.meaningfulValue; } });
+
+},
+"src/store.js": function(require, module, exports) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProjectStore = void 0;
+exports.migrateProject = migrateProject;
+const domain_js_1 = require("./domain.js");
+const STORAGE_KEY = 'eelforge.project.v1';
+function clone(value) {
+    return structuredClone(value);
+}
+function isRecord(value) {
+    return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+function stringValue(record, key, fallback = '') {
+    return typeof record[key] === 'string' ? record[key] : fallback;
+}
+function booleanValue(record, key, fallback) {
+    return typeof record[key] === 'boolean' ? record[key] : fallback;
+}
+function enumValue(record, key, allowed, fallback) {
+    const value = record[key];
+    return typeof value === 'string' && allowed.includes(value) ? value : fallback;
+}
+function numberArrayValue(record, key, fallback) {
+    const value = record[key];
+    return Array.isArray(value) && value.every((item) => typeof item === 'number') ? [...value] : fallback;
+}
+function setByPath(project, path, value) {
+    const next = clone(project);
+    const segments = path.split('.');
+    let cursor = next;
+    for (let index = 0; index < segments.length - 1; index += 1) {
+        const segment = segments[index];
+        if (!segment)
+            throw new Error(`Invalid path: ${path}`);
+        const target = cursor[segment];
+        if (!target || typeof target !== 'object')
+            throw new Error(`Invalid path: ${path}`);
+        cursor = target;
+    }
+    const leaf = segments.at(-1);
+    if (!leaf)
+        throw new Error(`Invalid path: ${path}`);
+    cursor[leaf] = value;
+    next.updatedAt = new Date().toISOString();
+    return next;
+}
+const HOST_IDS = ['rjdsp-modern', 'rjdsp-legacy', 'eel-vm-core'];
+const CHANNEL_MODES = ['mono', 'stereo', 'linked-stereo', 'dual-mono', 'mid-side'];
+const CPU_TARGETS = ['mobile-light', 'mobile-balanced', 'desktop-quality'];
+const LATENCY_MODES = ['zero', 'low', 'allowed'];
+const WORKFLOW_STAGES = ['vision', 'architect', 'prompt', 'analyze', 'refine'];
+function migrateProject(value) {
+    if (!isRecord(value))
+        throw new Error('Project data must be an object.');
+    const schemaVersion = value.schemaVersion;
+    if (schemaVersion !== 1 && schemaVersion !== 2) {
+        throw new Error('Unsupported EELForge project schema.');
+    }
+    if (!isRecord(value.vision) || !isRecord(value.contract)) {
+        throw new Error('Project vision or implementation contract is missing.');
+    }
+    const defaults = (0, domain_js_1.createDefaultProject)();
+    const vision = value.vision;
+    const contract = value.contract;
+    const originalName = stringValue(value, 'name', defaults.name);
+    const migratedName = schemaVersion === 1 && originalName === 'Untitled EEL Effect' ? '' : originalName;
+    const migratedContract = {
+        hostProfileId: enumValue(contract, 'hostProfileId', HOST_IDS, defaults.contract.hostProfileId),
+        channelMode: enumValue(contract, 'channelMode', CHANNEL_MODES, defaults.contract.channelMode),
+        sampleRates: numberArrayValue(contract, 'sampleRates', [...defaults.contract.sampleRates]),
+        latencyMode: enumValue(contract, 'latencyMode', LATENCY_MODES, defaults.contract.latencyMode),
+        cpuTarget: enumValue(contract, 'cpuTarget', CPU_TARGETS, defaults.contract.cpuTarget),
+        deviceTargets: stringValue(contract, 'deviceTargets', defaults.contract.deviceTargets),
+        parameterSmoothing: booleanValue(contract, 'parameterSmoothing', defaults.contract.parameterSmoothing),
+        outputProtection: booleanValue(contract, 'outputProtection', defaults.contract.outputProtection),
+        constraints: stringValue(contract, 'constraints', defaults.contract.constraints),
+    };
+    return {
+        schemaVersion: 2,
+        appVersion: '0.1.0-alpha.3',
+        id: stringValue(value, 'id', defaults.id),
+        name: migratedName,
+        createdAt: stringValue(value, 'createdAt', defaults.createdAt),
+        updatedAt: stringValue(value, 'updatedAt', defaults.updatedAt),
+        activeStage: enumValue(value, 'activeStage', WORKFLOW_STAGES, defaults.activeStage),
+        promptMode: 'architect',
+        vision: {
+            purpose: stringValue(vision, 'purpose'),
+            audibleGoal: stringValue(vision, 'audibleGoal'),
+            sourceMaterial: stringValue(vision, 'sourceMaterial'),
+            definitionOfSuccess: stringValue(vision, 'definitionOfSuccess'),
+            preserve: stringValue(vision, 'preserve'),
+            avoid: stringValue(vision, 'avoid'),
+            useLocation: stringValue(vision, 'useLocation'),
+            desiredControls: stringValue(vision, 'desiredControls'),
+            references: stringValue(vision, 'references'),
+        },
+        contract: migratedContract,
+        onboardingDismissed: booleanValue(value, 'onboardingDismissed', defaults.onboardingDismissed),
+    };
+}
+function loadProject() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw)
+            return (0, domain_js_1.createDefaultProject)();
+        return migrateProject(JSON.parse(raw));
+    }
+    catch {
+        return (0, domain_js_1.createDefaultProject)();
+    }
+}
+class ProjectStore {
+    #state = loadProject();
+    #listeners = new Set();
+    #saveHandle = null;
+    getState() {
+        return this.#state;
+    }
+    subscribe(listener) {
+        this.#listeners.add(listener);
+        listener(this.#state);
+        return () => this.#listeners.delete(listener);
+    }
+    dispatch(action, notifyListeners = true) {
+        switch (action.type) {
+            case 'set-name':
+                this.#state = {
+                    ...this.#state,
+                    name: action.value,
+                    updatedAt: new Date().toISOString(),
+                };
+                break;
+            case 'set-stage':
+                this.#state = {
+                    ...this.#state,
+                    activeStage: action.value,
+                    updatedAt: new Date().toISOString(),
+                };
+                break;
+            case 'set-prompt-mode':
+                this.#state = {
+                    ...this.#state,
+                    promptMode: action.value,
+                    updatedAt: new Date().toISOString(),
+                };
+                break;
+            case 'set-path':
+                this.#state = setByPath(this.#state, action.path, action.value);
+                break;
+            case 'dismiss-onboarding':
+                this.#state = {
+                    ...this.#state,
+                    onboardingDismissed: true,
+                    updatedAt: new Date().toISOString(),
+                };
+                break;
+            case 'replace-project':
+                this.#state = clone(action.value);
+                break;
+            case 'reset-project':
+                this.#state = (0, domain_js_1.createDefaultProject)();
+                break;
+            default: {
+                const exhaustive = action;
+                throw new Error(`Unhandled action: ${JSON.stringify(exhaustive)}`);
+            }
+        }
+        this.#queueSave();
+        if (notifyListeners) {
+            this.#listeners.forEach((listener) => listener(this.#state));
+        }
+    }
+    exportProject() {
+        const payload = {
+            schemaVersion: 2,
+            appVersion: this.#state.appVersion,
+            exportedAt: new Date().toISOString(),
+            project: this.#state,
+        };
+        return new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    }
+    importProject(raw) {
+        const parsed = JSON.parse(raw);
+        const candidate = isRecord(parsed) && 'project' in parsed ? parsed.project : parsed;
+        try {
+            return migrateProject(candidate);
+        }
+        catch {
+            throw new Error('This file is not a compatible EELForge v0.1 project.');
+        }
+    }
+    #queueSave() {
+        if (this.#saveHandle !== null)
+            window.clearTimeout(this.#saveHandle);
+        this.#saveHandle = window.setTimeout(() => {
+            try {
+                localStorage.setItem(_STORAGE_KEY, JSON.stringify(this.#state));
+            }
+            finally {
+                this.#saveHandle = null;
+            }
+        }, 180);
+    }
+}
+exports.ProjectStore = ProjectStore;
+
+}
+  };
+  const cache = Object.create(null);
+  function normalize(parts) {
+    const out = [];
+    for (const part of parts) {
+      if (!part || part === '.') continue;
+      if (part === '..') out.pop(); else out.push(part);
+    }
+    return out.join('/');
+  }
+  function resolve(from, request) {
+    if (request.endsWith('.css')) return request;
+    if (!request.startsWith('.')) throw new Error('Unsupported bundled dependency: ' + request);
+    const base = from.split('/');
+    base.pop();
+    return normalize(base.concat(request.split('/')));
+  }
+  function load(id) {
+    if (id.endsWith('.css')) return {};
+    if (cache[id]) return cache[id].exports;
+    const factory = modules[id];
+    if (!factory) throw new Error('Bundled module not found: ' + id);
+    const module = { exports: {} };
+    cache[id] = module;
+    factory((request) => load(resolve(id, request)), module, module.exports);
+    return module.exports;
+  }
+  load('src/main.js');
+})();
+
+</script>
+<!-- EELFORGE:APPLICATION:END -->
+</body>
+</html>
