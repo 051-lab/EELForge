@@ -28,33 +28,74 @@ function outerScriptTags(html) {
   return tags;
 }
 
+function markupWithoutScriptBodies(html) {
+  const opening = /<script\b[^>]*>/gi;
+  let cursor = 0;
+  let result = '';
+
+  while (cursor < html.length) {
+    opening.lastIndex = cursor;
+    const match = opening.exec(html);
+    if (!match) {
+      result += html.slice(cursor);
+      break;
+    }
+
+    result += html.slice(cursor, opening.lastIndex);
+    const closingIndex = html.toLowerCase().indexOf('</script>', opening.lastIndex);
+    if (closingIndex < 0) {
+      cursor = opening.lastIndex;
+      continue;
+    }
+
+    result += '</script>';
+    cursor = closingIndex + '</script>'.length;
+  }
+
+  return result;
+}
+
 export function verifySingleFile(html) {
   const errors = [];
   for (const marker of REQUIRED_MARKERS) {
     if (!html.includes(marker)) errors.push(`Missing required marker: ${marker}`);
   }
 
-  const forbidden = [
-    [/<script\b[^>]*\bsrc\s*=/i, 'external script source'],
+  const allScripts = outerScriptTags(html);
+  const executableScripts = allScripts.filter(
+    (tag) => !/\btype\s*=\s*["']application\/json["']/i.test(tag),
+  );
+  if (executableScripts.some((tag) => /\bsrc\s*=/i.test(tag))) {
+    errors.push('Found forbidden external script source.');
+  }
+  if (executableScripts.some((tag) => /\btype\s*=\s*["']module["']/i.test(tag))) {
+    errors.push('Found forbidden module script.');
+  }
+  if (executableScripts.length !== 1) {
+    errors.push(`Expected exactly one executable script, found ${executableScripts.length}.`);
+  }
+
+  const markup = markupWithoutScriptBodies(html);
+  const markupForbidden = [
     [/<link\b[^>]*rel=["']?stylesheet["']?[^>]*href\s*=/i, 'external stylesheet'],
     [/(?:src|href)\s*=\s*["']https?:\/\//i, 'HTTP resource attribute'],
+    [/\bsrc\s*=\s*["']\/\//i, 'protocol-relative resource'],
+  ];
+  for (const [pattern, label] of markupForbidden) {
+    if (pattern.test(markup)) errors.push(`Found forbidden ${label}.`);
+  }
+
+  const contentForbidden = [
     [/url\(\s*["']?https?:\/\//i, 'HTTP CSS resource'],
     [/\bfetch\s*\(\s*["'`]https?:\/\//i, 'HTTP fetch request'],
     [/\b(?:WebSocket|EventSource)\s*\(\s*["'`]https?:\/\//i, 'HTTP streaming request'],
-    [/\bsrc\s*=\s*["']\/\//i, 'protocol-relative resource'],
     [/\/assets\//i, 'unresolved /assets/ path'],
     [/\bimport\s*\(/, 'dynamic import'],
     [/serviceWorker\s*\./i, 'service worker'],
-    [/<script\b[^>]*type=["']module["']/i, 'module script'],
   ];
-  for (const [pattern, label] of forbidden) {
+  for (const [pattern, label] of contentForbidden) {
     if (pattern.test(html)) errors.push(`Found forbidden ${label}.`);
   }
-
-  const scripts = outerScriptTags(html).filter(
-    (tag) => !/\btype\s*=\s*["']application\/json["']/i.test(tag),
-  );
-  if (scripts.length !== 1) errors.push(`Expected exactly one executable script, found ${scripts.length}.`);
 
   const styles = html.match(/<style\b[^>]*>/gi) ?? [];
   if (styles.length !== 1) errors.push(`Expected exactly one inline style block, found ${styles.length}.`);
