@@ -5,6 +5,7 @@ import { readyArchitectProject, schema2Project } from './fixtures';
 describe('project import and export', () => {
   it('rejects arbitrary JSON with the exact message', () => {
     expect(() => parseProjectImport('{}')).toThrowError(new ProjectImportError());
+    expect(() => parseProjectImport('{"schemaVersion":3}')).toThrowError(new ProjectImportError());
   });
 
   it('regenerates import identity and timestamps', () => {

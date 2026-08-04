@@ -22,6 +22,7 @@ describe('project migration', () => {
   it('accepts export envelopes and rejects unsupported structures', () => {
     expect(migrateProject({ project: schema2Project() }).id).toBe('project-ready');
     expect(() => migrateProject({})).toThrow('Unsupported EELForge project structure');
+    expect(() => migrateProject({ schemaVersion: 3 })).toThrow('Unsupported EELForge project structure');
     expect(() => migrateProject({ schemaVersion: 99, vision: {}, contract: {} })).toThrow('Unsupported EELForge project schema');
   });
 });
