@@ -116,7 +116,7 @@ export function PromptPanel(props: PromptPanelProps) {
           <input type="file" accept="application/json,.json" hidden onChange={handleFileImport} />
         </label>
         <button type="button" onClick={props.onReset}>Reset</button>
-        <button type="button" onClick={props.onBackToDashboard}>Dashboard</button>
+        <button type="button" onClick={props.onBackToDashboard}>Back to Dashboard</button>
       </div>
     </article>
   );
