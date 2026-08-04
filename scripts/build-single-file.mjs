@@ -1,6 +1,7 @@
 import { readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { replaceOnceLiteral } from './single-file-utils.mjs';
 import { verifySingleFile } from './verify-single-file.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,12 +28,12 @@ try {
 
   const scriptTag = scriptMatches[0][0];
   const script = await readFile(assetPath(scriptMatches[0][1]), 'utf8');
-  html = html.replace(scriptTag, '');
+  html = replaceOnceLiteral(html, scriptTag, '');
 
   let css = '';
   if (cssMatches.length === 1) {
     css = await readFile(assetPath(cssMatches[0][1]), 'utf8');
-    html = html.replace(cssMatches[0][0], '');
+    html = replaceOnceLiteral(html, cssMatches[0][0], '');
   }
 
   const header = await readFile(path.join(root, 'handoff', 'agent-handoff-header.html'), 'utf8');
@@ -40,9 +41,9 @@ try {
   const style = `<style>\n${css}\n</style>`;
   const executable = `<script>\n${script.replace(/<\//g, '<\\/')}\n</script>`;
 
-  html = html.replace(/<!doctype html>/i, `<!doctype html>\n${header.trim()}`);
-  html = html.replace('</head>', `${manifest}\n${style}\n</head>`);
-  html = html.replace('</body>', `${executable}\n</body>`);
+  html = html.replace(/<!doctype html>/i, () => `<!doctype html>\n${header.trim()}`);
+  html = replaceOnceLiteral(html, '</head>', `${manifest}\n${style}\n</head>`);
+  html = replaceOnceLiteral(html, '</body>', `${executable}\n</body>`);
 
   const verification = verifySingleFile(html);
   if (!verification.ok) throw new Error(`Single-file verification failed:\n${verification.errors.join('\n')}`);

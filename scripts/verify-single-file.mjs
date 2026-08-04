@@ -10,8 +10,8 @@ const REQUIRED_MARKERS = [
   'id="app"',
 ];
 
-function outerScriptTags(html) {
-  const tags = [];
+function outerScripts(html) {
+  const scripts = [];
   const opening = /<script\b[^>]*>/gi;
   let cursor = 0;
 
@@ -19,13 +19,22 @@ function outerScriptTags(html) {
     opening.lastIndex = cursor;
     const match = opening.exec(html);
     if (!match) break;
-    tags.push(match[0]);
 
     const closingIndex = html.toLowerCase().indexOf('</script>', opening.lastIndex);
-    cursor = closingIndex >= 0 ? closingIndex + '</script>'.length : opening.lastIndex;
+    if (closingIndex < 0) {
+      scripts.push({ tag: match[0], content: html.slice(opening.lastIndex), closed: false });
+      break;
+    }
+
+    scripts.push({
+      tag: match[0],
+      content: html.slice(opening.lastIndex, closingIndex),
+      closed: true,
+    });
+    cursor = closingIndex + '</script>'.length;
   }
 
-  return tags;
+  return scripts;
 }
 
 function markupWithoutScriptBodies(html) {
@@ -61,18 +70,28 @@ export function verifySingleFile(html) {
     if (!html.includes(marker)) errors.push(`Missing required marker: ${marker}`);
   }
 
-  const allScripts = outerScriptTags(html);
+  const allScripts = outerScripts(html);
+  if (allScripts.some((script) => !script.closed)) errors.push('Found an unclosed script element.');
+
   const executableScripts = allScripts.filter(
-    (tag) => !/\btype\s*=\s*["']application\/json["']/i.test(tag),
+    (script) => !/\btype\s*=\s*["']application\/json["']/i.test(script.tag),
   );
-  if (executableScripts.some((tag) => /\bsrc\s*=/i.test(tag))) {
+  if (executableScripts.some((script) => /\bsrc\s*=/i.test(script.tag))) {
     errors.push('Found forbidden external script source.');
   }
-  if (executableScripts.some((tag) => /\btype\s*=\s*["']module["']/i.test(tag))) {
+  if (executableScripts.some((script) => /\btype\s*=\s*["']module["']/i.test(script.tag))) {
     errors.push('Found forbidden module script.');
   }
   if (executableScripts.length !== 1) {
     errors.push(`Expected exactly one executable script, found ${executableScripts.length}.`);
+  } else {
+    try {
+      // Parse without executing. This catches replacement-string corruption and other invalid bundles.
+      new Function(executableScripts[0].content);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      errors.push(`Executable script could not be parsed: ${message}`);
+    }
   }
 
   const markup = markupWithoutScriptBodies(html);

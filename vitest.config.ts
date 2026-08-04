@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
-    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/single-file-verifier.test.mjs'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx', 'tests/**/*.test.mjs'],
     restoreMocks: true,
     clearMocks: true,
     coverage: { enabled: false },

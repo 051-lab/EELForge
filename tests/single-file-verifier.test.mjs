@@ -15,9 +15,16 @@ describe('single-file verifier', () => {
     expect(verifySingleFile(html)).toEqual({ ok: true, errors: [] });
   });
 
-  it('does not count script-like text inside the executable script as another HTML element', () => {
-    const html = valid.replace("console.log('ok')", "const example='<script src=\\\"example.js\\\"></script>'; console.log(example)");
+  it('does not treat a script-like opening string as an outer HTML element', () => {
+    const html = valid.replace("console.log('ok')", "const example='<script src=\\\"example.js\\\">'; console.log(example)");
     expect(verifySingleFile(html)).toEqual({ ok: true, errors: [] });
+  });
+
+  it('rejects syntactically corrupted executable JavaScript', () => {
+    const html = valid.replace("console.log('ok')", 'const broken = </body>');
+    const result = verifySingleFile(html);
+    expect(result.ok).toBe(false);
+    expect(result.errors.some((error) => error.startsWith('Executable script could not be parsed:'))).toBe(true);
   });
 
   it.each([
