@@ -47,11 +47,12 @@ export function unwrapProjectCandidate(value: unknown): unknown {
 
 export function isRecognizableProject(value: unknown): boolean {
   const candidate = unwrapProjectCandidate(value);
-  if (!isRecord(candidate)) return false;
+  if (!isRecord(candidate) || !isRecord(candidate.vision) || !isRecord(candidate.contract)) return false;
+
   const schema = candidate.schemaVersion;
   if (schema === 1 || schema === 2 || schema === 3) return true;
-  return isRecord(candidate.vision) && isRecord(candidate.contract)
-    && (Object.keys(candidate.vision).length > 0 || Object.keys(candidate.contract).length > 0);
+
+  return Object.keys(candidate.vision).length > 0 || Object.keys(candidate.contract).length > 0;
 }
 
 export function migrateProject(value: unknown): ProjectState {
