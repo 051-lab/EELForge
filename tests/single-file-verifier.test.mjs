@@ -9,6 +9,17 @@ const valid = `<!doctype html>
 
 describe('single-file verifier', () => {
   it('accepts a self-contained artifact', () => expect(verifySingleFile(valid)).toEqual({ ok: true, errors: [] }));
+
+  it('allows harmless XML namespace strings inside the application bundle', () => {
+    const html = valid.replace("console.log('ok')", "const svgNamespace='http://www.w3.org/2000/svg'; console.log(svgNamespace)");
+    expect(verifySingleFile(html)).toEqual({ ok: true, errors: [] });
+  });
+
+  it('does not count script-like text inside the executable script as another HTML element', () => {
+    const html = valid.replace("console.log('ok')", "const example='<script src=\\\"example.js\\\"></script>'; console.log(example)");
+    expect(verifySingleFile(html)).toEqual({ ok: true, errors: [] });
+  });
+
   it.each([
     ['external scripts', valid.replace('<script>console', '<script src="x.js"></script><script>console')],
     ['external styles', valid.replace('<style>', '<link rel="stylesheet" href="x.css"><style>')],

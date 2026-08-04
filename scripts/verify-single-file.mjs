@@ -10,15 +10,37 @@ const REQUIRED_MARKERS = [
   'id="app"',
 ];
 
+function outerScriptTags(html) {
+  const tags = [];
+  const opening = /<script\b[^>]*>/gi;
+  let cursor = 0;
+
+  while (cursor < html.length) {
+    opening.lastIndex = cursor;
+    const match = opening.exec(html);
+    if (!match) break;
+    tags.push(match[0]);
+
+    const closingIndex = html.toLowerCase().indexOf('</script>', opening.lastIndex);
+    cursor = closingIndex >= 0 ? closingIndex + '</script>'.length : opening.lastIndex;
+  }
+
+  return tags;
+}
+
 export function verifySingleFile(html) {
   const errors = [];
   for (const marker of REQUIRED_MARKERS) {
     if (!html.includes(marker)) errors.push(`Missing required marker: ${marker}`);
   }
+
   const forbidden = [
     [/<script\b[^>]*\bsrc\s*=/i, 'external script source'],
     [/<link\b[^>]*rel=["']?stylesheet["']?[^>]*href\s*=/i, 'external stylesheet'],
-    [/\bhttps?:\/\//i, 'HTTP resource'],
+    [/(?:src|href)\s*=\s*["']https?:\/\//i, 'HTTP resource attribute'],
+    [/url\(\s*["']?https?:\/\//i, 'HTTP CSS resource'],
+    [/\bfetch\s*\(\s*["'`]https?:\/\//i, 'HTTP fetch request'],
+    [/\b(?:WebSocket|EventSource)\s*\(\s*["'`]https?:\/\//i, 'HTTP streaming request'],
     [/\bsrc\s*=\s*["']\/\//i, 'protocol-relative resource'],
     [/\/assets\//i, 'unresolved /assets/ path'],
     [/\bimport\s*\(/, 'dynamic import'],
@@ -28,8 +50,12 @@ export function verifySingleFile(html) {
   for (const [pattern, label] of forbidden) {
     if (pattern.test(html)) errors.push(`Found forbidden ${label}.`);
   }
-  const scripts = html.match(/<script\b(?![^>]*type=["']application\/json["'])[^>]*>/gi) ?? [];
+
+  const scripts = outerScriptTags(html).filter(
+    (tag) => !/\btype\s*=\s*["']application\/json["']/i.test(tag),
+  );
   if (scripts.length !== 1) errors.push(`Expected exactly one executable script, found ${scripts.length}.`);
+
   const styles = html.match(/<style\b[^>]*>/gi) ?? [];
   if (styles.length !== 1) errors.push(`Expected exactly one inline style block, found ${styles.length}.`);
   return { ok: errors.length === 0, errors };
