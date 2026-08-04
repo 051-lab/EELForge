@@ -2,151 +2,85 @@
 
 **Describe the sound. Formalize the DSP. Build the EEL2.**
 
-EELForge is a local-first workbench for turning an audio-effect idea into a structured DSP brief and a portable AI-agent handoff for EEL2 development.
-
-The initial target is **RootlessJamesDSP LiveProg**, with host profiles for:
-
-- RootlessJamesDSP Modern: `@init`, `@slider`, `@block`, `@sample`
-- RootlessJamesDSP Legacy: `@init`, `@sample`
-- Generic EEL2 / EEL_VM
-
-EELForge does not call an AI provider in the current release. It compiles prompts that can be handed to ChatGPT, Codex, Claude, Qwen, Gemini, local coding agents, or another development environment.
+EELForge is a local-first React workbench for turning an audio-effect idea, implementation contract, architecture report, or EEL2 script into a structured handoff for any AI development agent.
 
 ## Current release
 
-**Version:** `0.1.0-alpha.3`  
-**Development stage:** Phase 2A — Architect Handoff
+**Version:** `0.2.0`  
+**Project schema:** `3`  
+**Stage:** Bolt overhaul integration
 
-The current application provides:
+EELForge provides:
 
-- A structured Plugin Vision form
-- An Implementation Contract for host, channels, latency, CPU, and target devices
-- Five-field Architect readiness validation
-- Punctuation-placeholder rejection
-- A deterministic Architect Handoff compiler
-- Host-aware EEL2 section requirements
-- Focus-safe live prompt updates
-- Local browser persistence
-- Schema migration from Phase 1A projects
-- Project JSON import/export
-- Markdown prompt export
-- Visible future modes for Build, Repair, Refine, Optimize, and Review
+- A searchable multi-project dashboard
+- Blank projects and four editable DSP starter templates
+- Architect, Build, Repair, Refine, Optimize, and Review prompt modes
+- Verified RootlessJamesDSP Modern and Legacy host contracts
+- Generic EEL2 / EEL_VM targeting without invented host sections
+- Strict schema-1/2/3 migration and JSON import validation
+- Project duplication, rename, deletion, import, and export
+- Ten manual snapshots per project with storage-budget pruning
+- An offline single-file edition for AI-agent handoffs
 
-## Portable single-file edition
+EELForge does **not** call an AI provider, execute EEL2, or prove that a script compiles. Its output is a deterministic prompt and must be evaluated by the receiving agent and, when applicable, a real EEL2 host or compiler.
 
-A self-contained AI-agent handoff edition is available at:
+## Any-agent compatibility
 
-[`releases/EELForge-v0.1-Phase2A-Handoff.html`](releases/EELForge-v0.1-Phase2A-Handoff.html)
+No AI-specific skill is required. The repository includes `AGENTS.md` and an embedded plain-language handoff inside the portable HTML. ChatGPT, Codex, Claude, Gemini, Qwen, Mistral, Bolt, local agents, and human developers can use the same application and contracts.
 
-Download the file and open it directly in Chrome or Edge. It contains all required CSS, JavaScript, project metadata, and agent instructions, so it does not require Node.js, npm, Vite, a local server, or an internet connection.
-
-The portable HTML can also be uploaded directly to Qwen, Mistral, Claude, Gemini, or another AI platform for review and proposed modifications. It is a generated handoff artifact; accepted changes should be backported into the modular TypeScript/Vite source before an official release is rebuilt.
+Superpowers is used optionally as a development workflow; it is not installed by or required by EELForge.
 
 ## Run locally
 
-### Requirements
-
-- Node.js 22 or newer recommended
-- npm
-
-### Start development mode
+Requirements: Node.js 22 and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Open the local address printed by Vite, normally:
+Vite normally opens at `http://localhost:5173/`.
 
-```text
-http://localhost:5173/
-```
-
-### Validate the project
+## Validate
 
 ```bash
 npm run typecheck
 npm test
 npm run build
+npm run build:single
+npm run verify:single
 ```
 
-## Workflow
+## Portable single-file edition
 
-EELForge is organized around the following long-term development flow:
+The generated artifact is:
 
-```text
-VISION → ARCHITECT → PROMPT → ANALYZE → REFINE
-```
+[`releases/EELForge-v0.2-Handoff.html`](releases/EELForge-v0.2-Handoff.html)
 
-The present release completes the first dependable prompt path:
+Download it and open it directly in Chrome or Edge. It contains its CSS, JavaScript, manifest, and agent guidance and makes no network request.
 
-```text
-Plugin Vision + Runtime Contract → Architect Handoff
-```
+## Verified host contracts
 
-## Architect Handoff behavior
-
-The generated prompt asks an agent to return an implementation-ready DSP architecture rather than prematurely writing production code. It includes:
-
-1. Plugin concept and operating principle
-2. Ordered signal flow
-3. Algorithms for each stage
-4. Controls, mappings, defaults, and smoothing
-5. Persistent state and memory requirements
-6. Sample-rate adaptation
-7. Stereo or mid/side behavior
-8. CPU and latency assessment
-9. Numerical safety and output protection
-10. Audible behavior and failure modes
-11. Validation and listening tests
-12. A final Build-agent specification
-
-Optional sections are omitted when empty. Inputs containing only punctuation such as `.`, `...`, or `-` do not count as meaningful context.
+| Profile | Available sections |
+|---|---|
+| RootlessJamesDSP Modern | `@init`, `@slider`, `@block`, `@sample` |
+| RootlessJamesDSP Legacy | `@init`, `@sample` |
+| Generic EEL2 / EEL_VM | No host-specific section contract predefined |
 
 ## Repository structure
 
 ```text
-EELForge/
-├── .github/workflows/ci.yml
-├── docs/
-├── releases/
-│   └── EELForge-v0.1-Phase2A-Handoff.html
-├── src/
-│   ├── prompt/
-│   ├── domain.ts
-│   ├── filename.ts
-│   ├── main.ts
-│   ├── migrations.ts
-│   ├── store.ts
-│   └── styles.css
-├── tests/
-├── index.html
-├── package.json
-├── tsconfig.json
-├── tsconfig.test.json
-└── vite.config.ts
+src/                  React UI, domain, storage, migration, and prompt compilers
+tests/                Unit and interaction tests
+scripts/              Portable build and verifier
+handoff/              Embedded any-agent instructions
+releases/             Verified standalone HTML
+docs/                 Architecture, roadmap, and release notes
+.github/workflows/    CI validation
 ```
 
-## Roadmap
-
-- **Phase 2B:** Build Handoff
-- **Phase 2C:** Repair, Refine, Optimize, and Review handoffs
-- **Phase 3:** Explainable DSP architecture recommendation engine
-- **Phase 4:** EEL2 import and heuristic static analysis
-- **Phase 5:** Curated reference library
-- **Phase 6:** Exact EEL_VM validation research
-
-See [the roadmap](docs/ROADMAP.md) for details.
-
-## Project principles
-
-- Local-first and provider-independent
-- Recommendations must be inspectable and overridable
-- Host restrictions must be separated from project preferences
-- No unsupported claim of successful EEL2 compilation
-- Mobile CPU and latency constraints must affect recommendations
-- Imported artifacts become verified context only through explicit user action
+See [Architecture](docs/ARCHITECTURE.md), [Roadmap](docs/ROADMAP.md), and [Release Notes](docs/RELEASES.md).
 
 ## License
 
-EELForge is released under the [MIT License](LICENSE).
+MIT © 2026 051-lab

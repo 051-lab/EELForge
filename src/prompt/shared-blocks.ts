@@ -1,5 +1,5 @@
-import { hostLabels, hostSections, type ProjectState } from '../domain.js';
-import { meaningfulValue } from './meaningful.js';
+import { hostLabels, hostSections, type ProjectState } from '../domain';
+import { meaningfulValue } from './meaningful';
 
 function formatSampleRate(rate: number): string {
   const khz = rate / 1000;
@@ -49,4 +49,15 @@ export const EEL2_DESIGN_REQUIREMENTS = [
   '- Move invariant and control-rate calculations out of `@sample` when possible.',
   '- Keep the per-sample path bounded, numerically safe, and suitable for real-time mobile processing.',
   '- State assumptions instead of silently inventing missing requirements.',
+].join('\n');
+
+export const EEL2_VALIDATION_REQUIREMENTS = [
+  '## Validation and truthfulness requirements',
+  '',
+  '- Report exactly what you verified and what you did not.',
+  '- Do not claim a behavior works without testing or reasoning through the code path.',
+  '- Include a control table listing every slider with its symbol, range, default, mapping, and smoothing.',
+  '- Note any numerical-safety risks (denormals, division by zero, overflow, aliasing).',
+  '- Note any stereo or state-independence issues.',
+  '- If you could not fully verify something, say so explicitly rather than omitting it.',
 ].join('\n');

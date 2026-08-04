@@ -1,0 +1,10 @@
+{
+  "product": "EELForge",
+  "version": "0.2.0",
+  "schemaVersion": 3,
+  "artifactName": "EELForge-v0.2-Handoff.html",
+  "edition": "ai-handoff",
+  "offline": true,
+  "directFileExecution": true,
+  "implementedPromptModes": ["architect", "build", "repair", "refine", "optimize", "review"]
+}

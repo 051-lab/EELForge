@@ -1,18 +1,33 @@
 {
   "name": "eelforge",
-  "version": "0.1.0-alpha.3",
   "private": true,
+  "version": "0.2.0",
   "type": "module",
-  "description": "Local-first EEL2 DSP architecture and AI-agent prompt workbench for RootlessJamesDSP.",
+  "description": "Local-first EEL2 DSP prompt workbench for RootlessJamesDSP and generic EEL2 workflows.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test:compile": "node scripts/clean-test-dist.mjs && tsc -p tsconfig.test.json",
-    "test": "npm run test:compile && node --test tests/*.test.mjs"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run typecheck && vite build",
+    "build:single": "npm run build && node scripts/build-single-file.mjs",
+    "verify:single": "node scripts/verify-single-file.mjs releases/EELForge-v0.2-Handoff.html",
+    "clean:single": "node scripts/clean-single-file.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "vite": "^7.0.0"
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.5",
+    "vitest": "^3.2.4"
   }
 }

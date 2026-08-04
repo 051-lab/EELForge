@@ -1,7 +1,7 @@
-import type { ProjectState } from '../domain.js';
-import { hasMeaningfulContent } from './meaningful.js';
-import { bullet, compactLines, EEL2_DESIGN_REQUIREMENTS, runtimeTargetBlock } from './shared-blocks.js';
-import type { CompiledPrompt } from './types.js';
+import type { ProjectState } from '../domain';
+import { hasMeaningfulContent } from './meaningful';
+import { bullet, compactLines, EEL2_DESIGN_REQUIREMENTS, runtimeTargetBlock } from './shared-blocks';
+import type { CompiledPrompt } from './types';
 
 const REQUIRED_FIELDS = [
   { label: 'plugin name', read: (state: ProjectState) => state.name },
@@ -12,9 +12,7 @@ const REQUIRED_FIELDS = [
 ] as const;
 
 export function architectMissingFields(state: ProjectState): string[] {
-  return REQUIRED_FIELDS
-    .filter((field) => !hasMeaningfulContent(field.read(state)))
-    .map((field) => field.label);
+  return REQUIRED_FIELDS.filter((field) => !hasMeaningfulContent(field.read(state))).map((field) => field.label);
 }
 
 export function architectCompletion(state: ProjectState): { completed: number; total: number } {
@@ -24,6 +22,11 @@ export function architectCompletion(state: ProjectState): { completed: number; t
 
 export function buildArchitectPrompt(state: ProjectState): CompiledPrompt {
   const missingRequiredFields = architectMissingFields(state);
+
+  const requiredFields = REQUIRED_FIELDS.map((field) => ({
+    label: field.label,
+    filled: hasMeaningfulContent(field.read(state)),
+  }));
 
   const pluginBrief = compactLines([
     '## Plugin brief',
@@ -85,5 +88,6 @@ export function buildArchitectPrompt(state: ProjectState): CompiledPrompt {
     characterCount: text.length,
     readiness: missingRequiredFields.length === 0 ? 'ready' : 'draft',
     missingRequiredFields,
+    requiredFields,
   };
 }

@@ -2,29 +2,35 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, integration/bolt-v0.2-overhaul]
   pull_request:
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
       - name: Type-check
         run: npm run typecheck
-
-      - name: Run tests
+      - name: Test
         run: npm test
-
-      - name: Build production bundle
-        run: npm run build
+      - name: Build portable release
+        run: npm run build:single
+      - name: Verify portable release
+        run: npm run verify:single
+      - name: Confirm generated release is committed
+        run: git diff --exit-code -- package-lock.json releases/EELForge-v0.2-Handoff.html
+      - name: Upload verified release
+        uses: actions/upload-artifact@v4
+        with:
+          name: eelforge-v0.2-integration
+          path: releases/EELForge-v0.2-Handoff.html
