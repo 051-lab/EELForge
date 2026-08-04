@@ -1,4 +1,4 @@
-import type { PromptMode } from '../domain.js';
+import type { PromptMode } from '../domain';
 
 export type PromptReadiness = 'draft' | 'ready';
 
@@ -9,4 +9,5 @@ export interface CompiledPrompt {
   characterCount: number;
   readiness: PromptReadiness;
   missingRequiredFields: string[];
+  requiredFields: { label: string; filled: boolean }[];
 }

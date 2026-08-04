@@ -1,9 +1,28 @@
-export type WorkflowStage = 'vision' | 'architect' | 'prompt' | 'analyze' | 'refine';
+export const APP_VERSION = '0.2.0' as const;
+export const PROJECT_SCHEMA_VERSION = 3 as const;
+
+export const stages = ['vision', 'architect', 'build', 'iterate'] as const;
+export type Stage = (typeof stages)[number];
+
+export const promptModes = ['architect', 'build', 'repair', 'refine', 'optimize', 'review'] as const;
+export type PromptMode = (typeof promptModes)[number];
+
 export type HostProfileId = 'rjdsp-modern' | 'rjdsp-legacy' | 'eel-vm-core';
 export type ChannelMode = 'mono' | 'stereo' | 'linked-stereo' | 'dual-mono' | 'mid-side';
-export type CpuTarget = 'mobile-light' | 'mobile-balanced' | 'desktop-quality';
 export type LatencyMode = 'zero' | 'low' | 'allowed';
-export type PromptMode = 'architect' | 'build' | 'repair' | 'refine' | 'optimize' | 'review';
+export type CpuTarget = 'mobile-light' | 'mobile-balanced' | 'desktop-quality';
+
+export const hostLabels: Readonly<Record<HostProfileId, string>> = {
+  'rjdsp-modern': 'RootlessJamesDSP Modern',
+  'rjdsp-legacy': 'RootlessJamesDSP Legacy',
+  'eel-vm-core': 'Generic EEL2 / EEL_VM',
+};
+
+export const hostSections: Readonly<Record<HostProfileId, readonly string[]>> = {
+  'rjdsp-modern': ['@init', '@slider', '@block', '@sample'],
+  'rjdsp-legacy': ['@init', '@sample'],
+  'eel-vm-core': [],
+};
 
 export interface VisionState {
   purpose: string;
@@ -30,54 +49,33 @@ export interface ContractState {
 }
 
 export interface ProjectState {
-  schemaVersion: 2;
-  appVersion: '0.1.0-alpha.3';
+  schemaVersion: typeof PROJECT_SCHEMA_VERSION;
+  appVersion: typeof APP_VERSION;
   id: string;
   name: string;
   createdAt: string;
   updatedAt: string;
-  activeStage: WorkflowStage;
+  activeStage: Stage;
   promptMode: PromptMode;
   vision: VisionState;
   contract: ContractState;
+  architectureReport: string;
+  eel2Script: string;
+  iterationNote: string;
   onboardingDismissed: boolean;
 }
 
-export const stages: readonly WorkflowStage[] = [
-  'vision',
-  'architect',
-  'prompt',
-  'analyze',
-  'refine',
-] as const;
+export interface ProjectFactoryOptions {
+  id?: string;
+  now?: string;
+}
 
-export const promptModes: readonly PromptMode[] = [
-  'architect',
-  'build',
-  'repair',
-  'refine',
-  'optimize',
-  'review',
-] as const;
-
-export const hostLabels: Readonly<Record<HostProfileId, string>> = {
-  'rjdsp-modern': 'RootlessJamesDSP Modern',
-  'rjdsp-legacy': 'RootlessJamesDSP Legacy',
-  'eel-vm-core': 'Generic EEL2 / EEL_VM',
-};
-
-export const hostSections: Readonly<Record<HostProfileId, readonly string[]>> = {
-  'rjdsp-modern': ['@init', '@slider', '@block', '@sample'],
-  'rjdsp-legacy': ['@init', '@sample'],
-  'eel-vm-core': [],
-};
-
-export function createDefaultProject(): ProjectState {
-  const now = new Date().toISOString();
+export function createDefaultProject(options: ProjectFactoryOptions = {}): ProjectState {
+  const now = options.now ?? new Date().toISOString();
   return {
-    schemaVersion: 2,
-    appVersion: '0.1.0-alpha.3',
-    id: crypto.randomUUID(),
+    schemaVersion: PROJECT_SCHEMA_VERSION,
+    appVersion: APP_VERSION,
+    id: options.id ?? crypto.randomUUID(),
     name: '',
     createdAt: now,
     updatedAt: now,
@@ -105,6 +103,9 @@ export function createDefaultProject(): ProjectState {
       outputProtection: true,
       constraints: '',
     },
+    architectureReport: '',
+    eel2Script: '',
+    iterationNote: '',
     onboardingDismissed: false,
   };
 }

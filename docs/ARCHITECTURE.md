@@ -1,70 +1,39 @@
-# EELForge Architecture
+# EELForge v0.2 Architecture
 
 ## Product boundary
 
-EELForge is a prompt and artifact workbench, not an AI provider. The browser application owns structured project state, deterministic prompt compilation, local persistence, and future artifact analysis.
+EELForge owns structured browser state, deterministic prompt compilation, local persistence, import/export, and portable packaging. It does not own AI inference, EEL2 execution, or compiler truth.
 
-## Current modules
+## Presentation
 
-### `src/domain.ts`
+React components in `src/components/` render the dashboard, vision and contract forms, mode-specific artifact fields, compiled prompt, and manual versions. Controlled inputs preserve focus and the complete typed value during live prompt updates.
 
-Defines the project schema, supported host profiles, workflow stages, prompt modes, and defaults.
+## Domain
 
-### `src/migrations.ts`
+`src/domain.ts` defines schema 3, release `0.2.0`, defaults, prompt modes, and host mappings. Host mappings are product contracts and must not be inferred from UI labels.
 
-Converts prior project exports and browser state into the current schema. Phase 1A fields are retained while Phase 2A fields are added with safe defaults.
+## Prompt compilation
 
-### `src/store.ts`
+Each module under `src/prompt/` is a pure function of `ProjectState`. `CompiledPrompt.requiredFields` is the only source for mode readiness counts. Optional punctuation-only context is omitted.
 
-Owns project mutations, autosave, subscriber notification, and focus-safe silent dispatch. Text entry can update state and derived prompt regions without destroying the focused control.
+## Import boundary
 
-### `src/prompt/`
-
-Contains pure prompt logic:
-
-- meaningful-content detection
-- shared host/runtime blocks
-- Architect readiness
-- Architect prompt compilation
-- compiler entry point
-
-Prompt modules contain no DOM or persistence behavior.
-
-### `src/main.ts`
-
-Renders the application shell, binds browser events, updates derived views, and handles project/prompt import and export.
+`src/import-export.ts` rejects arbitrary JSON. It accepts recognizable EELForge projects and export envelopes, migrates content, then assigns a new ID and timestamps. Version history is never imported.
 
 ## Persistence
 
-Current Phase 2A storage uses browser `localStorage` because the project contains bounded text state. A future artifact phase will move full imported scripts and reports to IndexedDB.
+The key `eelforge.projects.v3` stores:
 
-## State schema
-
-The schema version is independent from the application version:
-
-- `schemaVersion`: persistence compatibility
-- `appVersion`: release identification
-
-Current values:
-
-```json
-{
-  "schemaVersion": 2,
-  "appVersion": "0.1.0-alpha.3"
+```ts
+interface WorkspaceEnvelope {
+  schemaVersion: 3;
+  activeId: string | null;
+  entries: ProjectEntry[];
 }
 ```
 
-## Prompt compilation invariant
+The active project survives reload. Legacy keys are read but left untouched after migration. Each project keeps ten manual snapshots. Before storage, old snapshots are pruned globally, oldest first, to a 3 MiB envelope budget. Active project content is never truncated.
 
-A compiled prompt is a pure function of the current project state. Copy and export actions compile from current state rather than relying on stale render-time text.
+## Portable artifact
 
-## Focus-safety invariant
-
-Continuous text input dispatches with listener notification disabled. Only derived regions are updated:
-
-- readiness count
-- missing-field list
-- prompt text
-- character count
-
-Selects, checkboxes, project import, and reset may perform a complete application render.
+Vite produces one JavaScript chunk and at most one CSS asset. `scripts/build-single-file.mjs` inlines them, inserts the any-agent header and release manifest, verifies the temporary HTML, and atomically publishes `releases/EELForge-v0.2-Handoff.html`.

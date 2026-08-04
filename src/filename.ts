@@ -1,4 +1,5 @@
-import { hasMeaningfulContent } from './prompt/meaningful.js';
+import type { PromptMode } from './domain';
+import { hasMeaningfulContent } from './prompt/meaningful';
 
 export function safeProjectSlug(name: string): string {
   if (!hasMeaningfulContent(name)) return 'untitled-eel-effect';
@@ -12,8 +13,8 @@ export function safeProjectSlug(name: string): string {
   return slug || 'untitled-eel-effect';
 }
 
-export function architectExportFilename(name: string): string {
-  return `${safeProjectSlug(name)}-architect-handoff.md`;
+export function promptExportFilename(name: string, mode: PromptMode): string {
+  return `${safeProjectSlug(name)}-${mode}-handoff.md`;
 }
 
 export function projectExportFilename(name: string): string {

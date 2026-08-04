@@ -1,10 +1,10 @@
 node_modules/
 dist/
-.test-dist/
+coverage/
 .vite/
-*.local
+.eelforge_ref/
+.test-dist/
+.local-dist/
 *.log
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
+releases/*.tmp
