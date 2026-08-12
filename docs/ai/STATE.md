@@ -1,69 +1,64 @@
 # Project State
 
-> Fast-changing operational truth.
+> Fast-changing operational truth. Repository and Git evidence are authoritative.
 
-## Current Status
+## Operating Rules
 
-- **Branch:** `docs/relocate-and-ai-workflow` (feature branch from `main`, not pushed)
-- **HEAD:** docs/workflow AI-state consistency correction (this commit); previous commit `ec61019` — `Relocate docs and add AI workflow state` (commit `679de9e` remains `main` HEAD)
-- **Milestone:** v0.2.0 released — Bolt overhaul integration complete on `main` (commit `679de9e`)
-- **Session context:** AI Development Workflow V1.1 pilot — documentation/workflow stabilization committed; one bounded consistency correction applied to `docs/ai/`; branch not yet pushed
-- **Working tree:** Expected clean after the correction commit (the only pre-correction modification was `docs/ai/STATE.md`)
+- Verified repository, Git, remote, CI, test, and build evidence overrides stale narrative state.
+- Routine stale STATE mismatches are reported and reconciled during a bounded state/work update; they do not automatically stop work.
+- Stop and report when a conflict materially affects scope, architecture, safety, acceptance criteria, destructive operations, or required approval.
+- STATE contains exactly one independently verifiable atomic Next Action.
+- Do not create recursive metadata-chasing STATE-only commits merely because a prior STATE commit changed HEAD; update state at a meaningful work or handoff boundary.
+- Fast Path is for contained, low-risk, well-understood work. Deliberate Path is for ambiguous, architectural, risky, or cross-cutting work.
+- Human chooses goals, priorities, and meaningful decisions. Planner/Reviewer handles scope, architecture, and evidence review. Operator performs bounded repository and terminal execution.
+- Routine evidence inspection, bounded edits, tests, and ordinary scoped commits are allowed when in scope. Explicit authorization is required before `git reset --hard`, `git clean`, force push, branch deletion, history rewriting, global Git configuration changes, discarding unexplained work, broad destructive deletion, or bypassing failed validation.
+
+## Current Verified State
+
+- EELForge workflow migration began from synchronized `main` at baseline `c156317ec38ecfc988ebf257a90240f11fdd9ecd`.
+- The docs relocation and earlier AI workflow-state work are already merged into `main`; no application source is being changed by this documentation-only V1.2 migration.
+- The repository was clean before migration, and `docs/ai/` contains exactly five state files: `PROJECT.md`, `STATE.md`, `DECISIONS.md`, `REFERENCES.md`, and `INBOX.md`.
+- The current workflow operating contract is AI Development Workflow Project Kit V1.2.0. State remains Markdown-owned and tool-independent.
+- EELForge is a v0.2.0 application with project schema 3. Application validation is currently blocked by local dependency/environment state, not by a known application-source failure.
 
 ## Completed Recently
 
-Verified from git history and prior sessions:
+- EELForge v0.2.0 release and portable single-file handoff completed.
+- `ec61019` — `Relocate docs and add AI workflow state`.
+- `fb01180` — `Align AI workflow state with relocated docs`.
+- `c156317` — merge of `docs/relocate-and-ai-workflow` into `main`.
+- Earlier V1.1 pilot participation is historical context; V1.2 is the current operating contract.
 
-- **v0.2.0 release** (`679de9e`): React multi-project workbench, six prompt modes, schema 3, migration, import/export, snapshots, portable handoff HTML
-- **Portable single-file handoff** (`810573f`, `d73ba33`): `releases/EELForge-v0.2-Handoff.html` with embedded agent guidance
-- **`docs/ai/` workflow files** populated (PROJECT, STATE, DECISIONS, REFERENCES, INBOX)
-- **README.md and AGENTS.md link update:** architecture, roadmap, and release doc paths now point to `docs/extra/`
-- **Handoff artifact restored and verified (2026-08-11):** working-tree blob hash `83e51eed8b0c6c21cb991188cd2d3b76cefcf0e5` equals `HEAD`
-- **Docs/workflow stabilization commit** (`ec61019`, 2026-08-11): exactly one documentation-only commit on `docs/relocate-and-ai-workflow` — README/AGENTS path updates, `docs/*` → `docs/extra/*` relocations (all four 100% similarity renames), and the five `docs/ai/` workflow files; `releases/` untouched
-- **AI workflow state consistency correction (this commit, 2026-08-11):** `docs/ai/PROJECT.md` note updated (canonical docs live under `docs/extra/`; README/AGENTS already reference `docs/extra/`); `docs/ai/REFERENCES.md` note corrected (`README.md` now links to `docs/extra/ARCHITECTURE.md`); `docs/ai/STATE.md` rewritten for internal consistency
+## V1.2 Migration
 
-## In Progress
-
-- **Nothing.** The only working-tree modification before this correction task was `docs/ai/STATE.md`; the correction commit records PROJECT, REFERENCES, and STATE together, leaving a clean tree.
+The documentation-only reconciliation aligns EELForge's workflow state with the released AI Development Workflow Project Kit V1.2.0 operating contract. Application source changes, dependency changes, release-artifact changes, Git-configuration changes, and local environment repair remain outside this migration.
 
 ## Blockers / Risks
 
-- **Local dependency install broken (prior session, unresolved):** `npm ci` EPERM / incomplete `node_modules` — not re-tested; blocks local typecheck/tests/build until environment repaired
-- **Feature branch not pushed:** `docs/relocate-and-ai-workflow` exists only locally; `main` not yet updated with the doc relocation
-- **Node version drift:** local Node v24.18.1 vs README/CI Node 22
+- Observed local shell: Node `v24.18.1`, npm `11.16.0`; project README and CI expect Node 22.
+- `node_modules` exists but is invalid/incomplete. Observed `npm ls --depth=0` result: `ELSPROBLEMS`.
+- Application validation must remain separate from this workflow-state migration. Tests and builds are not claimed to pass locally and are not claimed to fail because of source defects.
 
 ## Verification
 
-| Check | Result | Notes |
-|-------|--------|-------|
-| Pre-task `git status` | **Passed** | Only `docs/ai/STATE.md` modified; branch `docs/relocate-and-ai-workflow` |
-| `releases/EELForge-v0.2-Handoff.html` before task | **Passed** | Clean; blob matches `HEAD` `83e51eed8b0c6c21cb991188cd2d3b76cefcf0e5` |
-| PROJECT.md stale note (README/AGENTS still on old paths) | **Found, corrected** | Note now states docs live under `docs/extra/` and README/AGENTS already updated |
-| REFERENCES.md stale note (README links old architecture path) | **Found, corrected** | Now states README links `docs/extra/ARCHITECTURE.md` |
-| Staged set | **To verify** | Intended: `docs/ai/PROJECT.md`, `docs/ai/REFERENCES.md`, `docs/ai/STATE.md` only |
-| `git diff` review | **To verify** | No application source; nothing under `releases/` |
-| Commit | **To verify** | `Align AI workflow state with relocated docs` |
-| Post-commit `git status` | **To verify** | Expected clean |
-| `npm ci` / typecheck / test / build | **Not run** | Prior session failed; environment not repaired |
-
-Environment: Windows 10, `core.autocrlf=true`, Node v24.18.1, npm 11.16.0 (README/CI specify Node 22).
+- Pre-migration Git preflight: clean `main`, HEAD/local `main`/`origin/main` all at `c156317ec38ecfc988ebf257a90240f11fdd9ecd`.
+- Exact five-file `docs/ai/` inventory confirmed.
+- `DECISIONS.md` and `INBOX.md` preservation hashes recorded before migration.
+- Application commands were not run because the dependency installation is invalid and the environment is Node 24 rather than the project/CI Node 22 expectation.
 
 ## Working Tree Notes
 
-**Clean (matches `HEAD`):**
-
-- Everything except the pre-correction `docs/ai/STATE.md` update; `releases/EELForge-v0.2-Handoff.html` pristine
-
-**Modified (this task):**
-
-- `docs/ai/PROJECT.md`, `docs/ai/REFERENCES.md`, `docs/ai/STATE.md` — consistency correction, staged together as one commit
-
-## Next Action
-
-Push `docs/relocate-and-ai-workflow` to `origin`.
-
-**Classification: Fast Path** — mechanical, bounded, no design decisions; branch content already verified and committed; single push command.
+- The migration is limited to the three existing files `docs/ai/PROJECT.md`, `docs/ai/STATE.md`, and `docs/ai/REFERENCES.md`.
+- `docs/ai/DECISIONS.md` and `docs/ai/INBOX.md` are preserved unchanged.
 
 ## Updated
 
-2026-08-11 — AI workflow state consistency correction committed; branch verified; release artifact untouched; next action recorded (terminal agent, AI Development Workflow V1.1).
+2026-08-12 — EELForge workflow state reconciled to AI Development Workflow Project Kit V1.2.0.
+
+## Next Action
+
+Activate Node 22 for the EELForge shell and verify that `node --version` reports a v22.x runtime.
+
+**Acceptance:** `node --version` reports a version whose major version is 22.
+
+**Scope:** Environment only; no repository modification required.

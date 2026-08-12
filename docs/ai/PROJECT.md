@@ -18,7 +18,7 @@ MIT license; copyright 2026 051-lab (per `LICENSE`).
 
 **Release:** `0.2.0`  
 **Project schema:** `3`  
-**Stage label (README):** Bolt overhaul integration
+**Historical context:** The README stage label “Bolt overhaul integration” describes the v0.2 release work; it is not a current project phase.
 
 Implemented capabilities (v0.2, per README, `release.json`, and `docs/extra/ROADMAP.md`):
 
@@ -101,7 +101,7 @@ Runtime dependencies: `react`, `react-dom` only. No database or external service
 | `rjdsp-legacy` | RootlessJamesDSP Legacy | `@init`, `@sample` |
 | `eel-vm-core` | Generic EEL2 / EEL_VM | none predefined |
 
-Local Node version on the machine used for this initialization: v24.18.1 (not documented as supported in README; CI specifies Node 22).
+**Repository-local workflow:** `docs/ai/` records tool-independent project state and agent handoff context. EELForge does not depend on Luna, Codex, OpenCode, ChatGPT, or another specific provider.
 
 ## Repository Conventions
 
