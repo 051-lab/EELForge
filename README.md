@@ -79,7 +79,7 @@ docs/                 Architecture, roadmap, and release notes
 .github/workflows/    CI validation
 ```
 
-See [Architecture](docs/ARCHITECTURE.md), [Roadmap](docs/ROADMAP.md), and [Release Notes](docs/RELEASES.md).
+See [Architecture](docs/extra/ARCHITECTURE.md), [Roadmap](docs/extra/ROADMAP.md), and [Release Notes](docs/extra/RELEASES.md).
 
 ## License
 

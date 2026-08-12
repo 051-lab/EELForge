@@ -4,7 +4,7 @@ EELForge can be developed by any capable coding agent. The Superpowers skill is 
 
 ## Start here
 
-1. Read `README.md`, `docs/ARCHITECTURE.md`, and `docs/ROADMAP.md`.
+1. Read `README.md`, `docs/extra/ARCHITECTURE.md`, and `docs/extra/ROADMAP.md`.
 2. Work on a feature branch, never directly on `main`.
 3. Preserve local-first and offline behavior.
 4. Run the full validation commands before claiming completion.
