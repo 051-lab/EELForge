@@ -26,7 +26,7 @@ See template above in prior revisions; add label, location/URL, why it matters, 
 ### `docs/extra/ARCHITECTURE.md`
 
 - **Why it matters:** v0.2 component boundaries, persistence envelope, portable build pipeline.
-- **Note:** Relocated from `docs/ARCHITECTURE.md` in the current working tree; `README.md` still links to the old path.
+- **Note:** Relocated from `docs/ARCHITECTURE.md`; `README.md` now links to `docs/extra/ARCHITECTURE.md`.
 
 ### `docs/extra/ROADMAP.md`
 

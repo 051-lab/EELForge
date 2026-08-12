@@ -123,7 +123,7 @@ docs/                 Architecture, roadmap, release notes (see note below)
 .github/workflows/    CI validation
 ```
 
-**Note:** At initialization time, canonical architecture/roadmap/release docs were relocated from `docs/` to `docs/extra/` in the working tree, but `README.md` and `AGENTS.md` still reference the original `docs/` paths. `docs/ai/` holds the AI Development Workflow state files. `docs/superpowers/` holds Bolt v0.2 overhaul plan and design artifacts.
+**Note:** Canonical architecture/roadmap/release docs now live under `docs/extra/`; `README.md` and `AGENTS.md` have already been updated to reference the `docs/extra/` paths. `docs/ai/` holds the AI Development Workflow state files. `docs/superpowers/` holds existing Superpowers planning and design material.
 
 **Release metadata:** `release.json` mirrors product version, schema, artifact name, and implemented prompt modes.
 
