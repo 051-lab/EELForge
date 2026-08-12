@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import type { ProjectState, PromptMode } from '../domain';
 import type { CompiledPrompt } from '../prompt';
 import { Field } from './Field';
@@ -13,6 +14,7 @@ interface PromptPanelProps {
   onImportProject: (file: File) => void;
   onReset: () => void;
   onBackToDashboard: () => void;
+  onPromote: (artifact: string, target: 'architectureReport' | 'eel2Script', mode: PromptMode) => boolean;
 }
 
 const MODE_TABS: readonly { id: PromptMode; label: string }[] = [
@@ -52,6 +54,17 @@ export function PromptPanel(props: PromptPanelProps) {
   const completed = compiled.requiredFields.filter((field) => field.filled).length;
   const total = compiled.requiredFields.length;
   const modeFields = MODE_FIELDS[state.promptMode];
+  const [agentResult, setAgentResult] = useState('');
+
+  useEffect(() => {
+    setAgentResult('');
+  }, [state.id, state.promptMode]);
+
+  const promotionTarget = state.promptMode === 'architect'
+    ? { field: 'architectureReport' as const, mode: 'build' as const, label: 'Promote to Build' }
+    : ['build', 'repair', 'refine', 'optimize'].includes(state.promptMode)
+      ? { field: 'eel2Script' as const, mode: 'review' as const, label: 'Promote to Review' }
+      : null;
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -88,6 +101,30 @@ export function PromptPanel(props: PromptPanelProps) {
         <div className="bar-label"><span>{completed} of {total} required fields</span><span>{state.promptMode}</span></div>
       </div>
       {!ready && <div className="missing-fields">Missing: {compiled.missingRequiredFields.join(', ')}</div>}
+
+      {promotionTarget && (
+        <section className="artifact-intake" aria-label="External agent result">
+          <label htmlFor="agent-result">External agent result</label>
+          <p>Paste the result returned by an external AI agent. EELForge does not send it anywhere.</p>
+          <textarea
+            id="agent-result"
+            rows={8}
+            value={agentResult}
+            onChange={(event) => setAgentResult(event.target.value)}
+            placeholder={state.promptMode === 'architect' ? 'Paste the architecture report here.' : 'Paste the complete EEL2 script here.'}
+          />
+          <button
+            type="button"
+            className="primary"
+            disabled={!agentResult.trim()}
+            onClick={() => {
+              if (props.onPromote(agentResult, promotionTarget.field, promotionTarget.mode)) setAgentResult('');
+            }}
+          >
+            {promotionTarget.label}
+          </button>
+        </section>
+      )}
 
       {modeFields.length > 0 && (
         <div className="form-stack mode-inputs">
