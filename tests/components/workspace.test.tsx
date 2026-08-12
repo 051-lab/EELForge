@@ -75,6 +75,85 @@ describe('six-mode workspace', () => {
     expect(store.activeProject?.promptMode).toBe('repair');
   });
 
+  it.each([
+    ['Build', 'build-specific script'],
+    ['Repair', 'repair-specific script'],
+    ['Refine', 'refine-specific script'],
+    ['Optimize', 'optimize-specific script'],
+  ])('directly promotes from %s into Review and compiles the script', async (mode, script) => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    await user.click(screen.getByRole('button', { name: mode }));
+    const intake = screen.getByRole('textbox', { name: 'External agent result' });
+    const promote = screen.getByRole('button', { name: 'Promote to Review' });
+    expect(promote).toBeInTheDocument();
+    await user.type(intake, script);
+    await user.click(promote);
+    expect(store.activeProject?.eel2Script).toBe(script);
+    expect(store.activeProject?.promptMode).toBe('review');
+    expect(screen.getByLabelText('EEL2 script to review')).toHaveValue(script);
+    expect(screen.getByTestId('compiled-prompt')).toHaveTextContent(script);
+  });
+
+  it('keeps Review terminal by exposing no artifact promotion intake or action', async () => {
+    const user = userEvent.setup();
+    render(<App store={readyStore()} />);
+    await user.click(screen.getByRole('button', { name: 'Review' }));
+    expect(screen.queryByRole('textbox', { name: 'External agent result' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Promote to Review' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Promote to Build' })).not.toBeInTheDocument();
+  });
+
+  it('rejects whitespace-only promotion without changing the artifact or mode', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    await user.click(screen.getByRole('button', { name: 'Repair' }));
+    const intake = screen.getByRole('textbox', { name: 'External agent result' });
+    await user.type(intake, ' \n\t ');
+    expect(screen.getByRole('button', { name: 'Promote to Review' })).toBeDisabled();
+    expect(store.activeProject?.eel2Script).toBe('');
+    expect(store.activeProject?.promptMode).toBe('repair');
+  });
+
+  it('confirms a materially different overwrite before advancing to Review', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    store.dispatch({ type: 'set-path', path: 'eel2Script', value: 'old script' });
+    render(<App store={store} />);
+    await user.click(screen.getByRole('button', { name: 'Repair' }));
+    await user.type(screen.getByRole('textbox', { name: 'External agent result' }), 'new script');
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    await user.click(screen.getByRole('button', { name: 'Promote to Review' }));
+    expect(store.activeProject?.eel2Script).toBe('new script');
+    expect(store.activeProject?.promptMode).toBe('review');
+    expect(store.activeProject?.vision.purpose).toBe(readyArchitectProject().vision.purpose);
+  });
+
+  it('clears unpromoted intake when opening another project', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    const projectA = store.activeId;
+    await user.type(screen.getByRole('textbox', { name: 'External agent result' }), 'project A result');
+    await user.click(screen.getByRole('button', { name: 'Dashboard' }));
+    await user.click(screen.getAllByRole('button', { name: 'New Project' })[1]);
+    expect(store.activeId).not.toBe(projectA);
+    expect(screen.getByRole('textbox', { name: 'External agent result' })).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Promote to Build' })).toBeDisabled();
+  });
+
+  it('clears intake when changing source modes', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    await user.type(screen.getByRole('textbox', { name: 'External agent result' }), 'architecture result');
+    await user.click(screen.getByRole('button', { name: 'Repair' }));
+    expect(screen.getByRole('textbox', { name: 'External agent result' })).toHaveValue('');
+    expect(screen.getByRole('button', { name: 'Promote to Review' })).toBeDisabled();
+  });
+
   it('updates punctuation-only readiness and reports clipboard rejection', async () => {
     const user = userEvent.setup();
     const store = readyStore();
