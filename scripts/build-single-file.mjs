@@ -1,7 +1,7 @@
 import { readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { replaceOnceLiteral } from './single-file-utils.mjs';
+import { normalizeBuiltHtml, normalizeLineEndings, replaceOnceLiteral } from './single-file-utils.mjs';
 import { verifySingleFile } from './verify-single-file.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,7 +20,7 @@ function assetPath(reference) {
 }
 
 try {
-  let html = await readFile(path.join(dist, 'index.html'), 'utf8');
+  let html = normalizeBuiltHtml(await readFile(path.join(dist, 'index.html'), 'utf8'));
   const scriptMatches = [...html.matchAll(/<script\b[^>]*src=["']([^"']+)["'][^>]*><\/script>/gi)];
   const cssMatches = [...html.matchAll(/<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["'][^>]*>/gi)];
   if (scriptMatches.length !== 1) throw new Error(`Expected one built JavaScript asset, found ${scriptMatches.length}.`);
@@ -36,7 +36,7 @@ try {
     html = replaceOnceLiteral(html, cssMatches[0][0], '');
   }
 
-  const header = await readFile(path.join(root, 'handoff', 'agent-handoff-header.html'), 'utf8');
+  const header = normalizeLineEndings(await readFile(path.join(root, 'handoff', 'agent-handoff-header.html'), 'utf8'));
   const manifest = `<!-- EELFORGE:MANIFEST:BEGIN -->\n<script type="application/json" id="eelforge-manifest">${JSON.stringify(release, null, 2).replace(/<\//g, '<\\/')}</script>\n<!-- EELFORGE:MANIFEST:END -->`;
   const style = `<style>\n${css}\n</style>`;
   const executable = `<script>\n${script.replace(/<\//g, '<\\/')}\n</script>`;
