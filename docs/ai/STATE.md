@@ -15,50 +15,66 @@
 
 ## Current Verified State
 
-- EELForge workflow migration began from synchronized `main` at baseline `c156317ec38ecfc988ebf257a90240f11fdd9ecd`.
-- The docs relocation and earlier AI workflow-state work are already merged into `main`; no application source is being changed by this documentation-only V1.2 migration.
-- The repository was clean before migration, and `docs/ai/` contains exactly five state files: `PROJECT.md`, `STATE.md`, `DECISIONS.md`, `REFERENCES.md`, and `INBOX.md`.
-- The current workflow operating contract is AI Development Workflow Project Kit V1.2.0. State remains Markdown-owned and tool-independent.
-- EELForge is a v0.2.0 application with project schema 3. Application validation is currently blocked by local dependency/environment state, not by a known application-source failure.
+- EELForge operates under AI Development Workflow Project Kit V1.2.0; state remains Markdown-owned and tool-independent.
+- EELForge remains v0.2.0 with project schema 3.
+- Local `main` and `origin/main` are synchronized at `bc3851508e6995020cc4f8702c18c8a6e0ad8b67`, the normal merge commit for PR #4.
+- PR #4 merged the deterministic single-file EOL fix; the working tree is clean.
+- Node 22 is available and verified locally. Dependency installation and the dependency tree are healthy.
+- Local typecheck, tests, production build, portable build, and standalone portable verification pass.
+- GitHub CI passes independently on Ubuntu 24.04 for the merged change.
+- The portable artifact is deterministic across Windows and Ubuntu, with no known current application-source validation blocker based on completed evidence.
 
 ## Completed Recently
 
-- EELForge v0.2.0 release and portable single-file handoff completed.
-- `ec61019` — `Relocate docs and add AI workflow state`.
-- `fb01180` — `Align AI workflow state with relocated docs`.
-- `c156317` — merge of `docs/relocate-and-ai-workflow` into `main`.
-- Earlier V1.1 pilot participation is historical context; V1.2 is the current operating contract.
-
-## V1.2 Migration
-
-The documentation-only reconciliation aligns EELForge's workflow state with the released AI Development Workflow Project Kit V1.2.0 operating contract. Application source changes, dependency changes, release-artifact changes, Git-configuration changes, and local environment repair remain outside this migration.
+- EELForge V1.2 workflow migration was merged previously.
+- Node 22 and dependency-environment repair completed; local validation was restored.
+- Local typecheck, test, production-build, and portable-artifact validation completed.
+- The deterministic single-file EOL bug was diagnosed and fixed in `09193640d6ae8a624091b73b870167b000ea6b65` (`Make single-file builds EOL-deterministic`).
+- PR #4 merged that fix in `bc3851508e6995020cc4f8702c18c8a6e0ad8b67`.
+- Windows and Ubuntu validation both passed, including portable-artifact reproducibility checks.
 
 ## Blockers / Risks
 
-- Observed local shell: Node `v24.18.1`, npm `11.16.0`; project README and CI expect Node 22.
-- `node_modules` exists but is invalid/incomplete. Observed `npm ls --depth=0` result: `ELSPROBLEMS`.
-- Application validation must remain separate from this workflow-state migration. Tests and builds are not claimed to pass locally and are not claimed to fail because of source defects.
+- No verified active blocker currently prevents normal EELForge development.
+- The system Node 24 installation still exists; new PowerShell sessions must use the configured fnm environment when EELForge requires Node 22.
+- Merged feature branches remain preserved pending explicit authorization for deletion; this is housekeeping, not a development blocker.
 
 ## Verification
 
-- Pre-migration Git preflight: clean `main`, HEAD/local `main`/`origin/main` all at `c156317ec38ecfc988ebf257a90240f11fdd9ecd`.
-- Exact five-file `docs/ai/` inventory confirmed.
-- `DECISIONS.md` and `INBOX.md` preservation hashes recorded before migration.
-- Application commands were not run because the dependency installation is invalid and the environment is Node 24 rather than the project/CI Node 22 expectation.
+### Local
+
+- Node `v22.23.2`; npm `10.9.8`.
+- Typecheck: PASS.
+- Tests: 13 test files / 58 tests, PASS.
+- Production build: PASS.
+- Portable build: PASS.
+- Standalone portable verification: PASS.
+
+### CI
+
+- PR #4 workflow run `31609076170`, Ubuntu 24.04, project Node `v22.23.1`.
+- `validate`: SUCCESS.
+- 58 / 58 tests, portable build, standalone verification, and generated-release Git diff gate: PASS.
+
+### Artifact
+
+- Canonical portable artifact SHA256: `3a9cf2acf667b742adb3e504f64307a5a81ac8e807108e0a9822511f5fe13da8`.
+- Canonical Git blob: `83e51eed8b0c6c21cb991188cd2d3b76cefcf0e5`.
 
 ## Working Tree Notes
 
-- The migration is limited to the three existing files `docs/ai/PROJECT.md`, `docs/ai/STATE.md`, and `docs/ai/REFERENCES.md`.
-- `docs/ai/DECISIONS.md` and `docs/ai/INBOX.md` are preserved unchanged.
+- `main` is synchronized and clean at merge commit `bc3851508e6995020cc4f8702c18c8a6e0ad8b67`.
+- This reconciliation changes only `docs/ai/STATE.md` on documentation branch `docs/reconcile-state-after-eol-fix`.
+- Existing merged feature branches are intentionally preserved pending explicit authorization.
 
 ## Updated
 
-2026-08-12 — EELForge workflow state reconciled to AI Development Workflow Project Kit V1.2.0.
+2026-08-12 — Post-merge state reconciliation after deterministic single-file reproducibility validation.
 
 ## Next Action
 
-Activate Node 22 for the EELForge shell and verify that `node --version` reports a v22.x runtime.
+Human selects the next EELForge product-development priority.
 
-**Acceptance:** `node --version` reports a version whose major version is 22.
+**Acceptance:** One concrete next product-development goal or maintenance priority is selected by the human and can be converted into a bounded work item.
 
-**Scope:** Environment only; no repository modification required.
+**Scope:** Planning/priority selection only; no repository modification is required by this action.
