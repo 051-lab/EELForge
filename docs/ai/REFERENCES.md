@@ -36,7 +36,7 @@ See template above in prior revisions; add label, location/URL, why it matters, 
 ### `docs/extra/RELEASES.md`
 
 - **Why it matters:** v0.2.0 release notes, legacy migration keys, storage recovery guidance.
-- **Note:** Relocated from `docs/RELEASES.md` in the current working tree.
+- **Note:** Relocated from `docs/RELEASES.md`; `docs/extra/RELEASES.md` is the canonical repository path.
 
 ### `docs/extra/PHASE_2A_ARCHITECT_HANDOFF.md`
 
@@ -63,7 +63,14 @@ See template above in prior revisions; add label, location/URL, why it matters, 
 - **Why it matters:** Machine-readable release manifest (version, schema, artifact name, modes).
 - **Conclusion:** `0.2.0`, schema `3`, artifact `EELForge-v0.2-Handoff.html`, six prompt modes.
 
-## Repositories / Issues / Pull Requests
+### AI Development Workflow Project Kit V1.2.0
+
+- **Repository:** https://github.com/051-lab/ai-development-workflow-kit
+- **Tag:** `v1.2.0`
+- **Released source commit:** `090d9a64f6c2454ff611364e9c6c9c6082752d2d`
+- **Why it matters:** Authoritative contract for the repository-state and agent-handoff workflow used by EELForge.
+- **Conclusion:** EELForge uses the V1.2 operating contract for repository state and agent handoffs; the workflow kit is guidance/state infrastructure, not an application runtime dependency.
+
 
 No upstream repository URLs (e.g. RootlessJamesDSP, EEL2, Bolt) are cited in project documentation or source files. Product names **RootlessJamesDSP**, **EEL2**, and **EEL_VM** are used as host/target labels only (`src/domain.ts`, prompts, README).
 
