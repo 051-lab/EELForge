@@ -17,7 +17,7 @@
 - Explainable DSP architecture recommendation engine
 - EEL2 import indexing and heuristic static analysis
 - Exact EEL_VM or host-backed validation research
-- Structured artifact promotion between modes
+- Structured artifact promotion between modes — implemented on the current development line / pre-release; external architecture and EEL2 results can be explicitly promoted into existing project artifacts with safe overwrite confirmation
 - Real version comparison designed as a separate feature
 - Optional cloud synchronization designed without weakening local-first use
 

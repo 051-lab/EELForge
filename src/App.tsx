@@ -116,6 +116,25 @@ export function App({ store: providedStore }: AppProps = {}) {
     if (!result.ok) showToast(result.message);
   }, [showToast, store]);
 
+  const promoteArtifact = useCallback((artifact: string, target: 'architectureReport' | 'eel2Script', mode: PromptMode): boolean => {
+    const value = artifact.trim();
+    if (!value) {
+      showToast('Paste a non-empty external agent result before promoting.');
+      return false;
+    }
+    const existing = String(store.activeProject?.[target] ?? '');
+    if (existing.trim() && existing !== artifact && !window.confirm(`Replace the existing ${target === 'architectureReport' ? 'architecture report' : 'EEL2 script'}?`)) {
+      return false;
+    }
+    const result = store.dispatch({ type: 'promote-artifact', target, artifact, mode });
+    if (!result.ok) {
+      showToast(result.message);
+      return false;
+    }
+    showToast(`External result promoted to ${mode === 'build' ? 'Build' : 'Review'}.`);
+    return true;
+  }, [showToast, store]);
+
   const copyPrompt = useCallback(async () => {
     if (!store.activeProject) return;
     try {
@@ -236,6 +255,7 @@ export function App({ store: providedStore }: AppProps = {}) {
             onImportProject={importProject}
             onReset={resetProject}
             onBackToDashboard={() => setView('dashboard')}
+            onPromote={promoteArtifact}
           />
           <VersionPanel versions={activeEntry?.versions ?? []} onSave={saveVersion} onRestore={restoreVersion} />
         </section>

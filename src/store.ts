@@ -49,6 +49,7 @@ export type StoreAction =
   | { type: 'set-name'; value: string }
   | { type: 'set-path'; path: string; value: unknown }
   | { type: 'set-prompt-mode'; value: PromptMode }
+  | { type: 'promote-artifact'; target: 'architectureReport' | 'eel2Script'; artifact: string; mode: PromptMode }
   | { type: 'set-stage'; value: Stage };
 
 export type StoreListener = () => void;
@@ -352,6 +353,12 @@ export class ProjectStore {
       case 'set-prompt-mode':
         entry.project.promptMode = action.value;
         entry.project.activeStage = action.value === 'architect' ? 'architect' : action.value === 'build' ? 'build' : 'iterate';
+        break;
+      case 'promote-artifact':
+        if (!action.artifact.trim()) return { ok: false, code: 'not-found', message: 'Artifact cannot be empty.' };
+        entry.project = setNestedPath(entry.project, action.target, action.artifact);
+        entry.project.promptMode = action.mode;
+        entry.project.activeStage = action.mode === 'build' ? 'build' : 'iterate';
         break;
       case 'set-stage':
         entry.project.activeStage = action.value;

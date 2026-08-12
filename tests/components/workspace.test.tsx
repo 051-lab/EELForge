@@ -43,6 +43,38 @@ describe('six-mode workspace', () => {
     expect(screen.queryByText('Compare')).not.toBeInTheDocument();
   });
 
+  it('promotes an external architecture result into Build and uses it immediately', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    const intake = screen.getByRole('textbox', { name: 'External agent result' });
+    await user.type(intake, '# Approved architecture\n\nUse a safe filter.');
+    await user.click(screen.getByRole('button', { name: 'Promote to Build' }));
+    expect(store.activeProject?.architectureReport).toBe('# Approved architecture\n\nUse a safe filter.');
+    expect(store.activeProject?.promptMode).toBe('build');
+    expect(screen.getByLabelText('Approved architecture report')).toHaveValue('# Approved architecture\n\nUse a safe filter.');
+  });
+
+  it('promotes iteration results into Review, rejects empty input, and protects overwrites', async () => {
+    const user = userEvent.setup();
+    const store = readyStore();
+    render(<App store={store} />);
+    await user.click(screen.getByRole('button', { name: 'Repair' }));
+    const intake = screen.getByRole('textbox', { name: 'External agent result' });
+    expect(screen.getByRole('button', { name: 'Promote to Review' })).toBeDisabled();
+    await user.type(intake, 'new script');
+    await user.click(screen.getByRole('button', { name: 'Promote to Review' }));
+    expect(store.activeProject?.eel2Script).toBe('new script');
+    expect(store.activeProject?.promptMode).toBe('review');
+
+    await user.click(screen.getByRole('button', { name: 'Repair' }));
+    await user.type(screen.getByRole('textbox', { name: 'External agent result' }), 'replacement');
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    await user.click(screen.getByRole('button', { name: 'Promote to Review' }));
+    expect(store.activeProject?.eel2Script).toBe('new script');
+    expect(store.activeProject?.promptMode).toBe('repair');
+  });
+
   it('updates punctuation-only readiness and reports clipboard rejection', async () => {
     const user = userEvent.setup();
     const store = readyStore();
